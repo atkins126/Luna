@@ -1,4 +1,4 @@
 # Luna
 Luna Game Toolkit
 
-(under construction)
+(under construction, check back later)
