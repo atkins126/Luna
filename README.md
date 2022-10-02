@@ -1,4 +1,6 @@
 # Luna
 Luna Game Toolkit
 
-(under construction, check back later)
+A open-source, SDL powered game development library for Delphi.
+
+(under construction)
