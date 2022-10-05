@@ -1,4 +1,4 @@
-<a href="https://topazgamelibrary.com" target="_blank">![Topaz Logo](media/logo.png)</a>
+<a href="https://github.com/tinyBigGAMES/Luna" target="_blank">![Luna Logo](media/logo.png)</a>
 
 [![Chat on Discord](https://img.shields.io/discord/754884471324672040.svg?logo=discord)](https://discord.gg/tPWjMwK) [![GitHub stars](https://img.shields.io/github/stars/tinyBigGAMES/Luna?style=social)](https://github.com/tinyBigGAMES/Luna/stargazers) [![GitHub Watchers](https://img.shields.io/github/watchers/tinyBigGAMES/Luna?style=social)](https://github.com/tinyBigGAMES/Luna/network/members) [![GitHub forks](https://img.shields.io/github/forks/tinyBigGAMES/Luna?style=social)](https://github.com/tinyBigGAMES/Luna/network/members)
 [![Twitter Follow](https://img.shields.io/twitter/follow/tinyBigGAMES?style=social)](https://twitter.com/tinyBigGAMES)
