@@ -26,17 +26,17 @@ if you wish to learn more about the Delphi language visit <a href="https://learn
 - Hardware accelerated with **Direct3D**
 - You interact with Luna via your derived `TLuGame` class and the various classes and routines in the `Luna` unit.
 - **Archive** (zip archive format, password protection)
-- **Window** (Direct3D, anti-aliasing, vsync, viewports, primitives, blending)
+- **Window** (Direct3D, anti-aliasing, viewports, render targets, primitives, blending)
 - **Input** (keyboard, mouse and joystick)
-- **Texture** (color key transparency, scaling, rotation, flipped, titled,  BMP, DDS, PCX, TGA, JPEG, PNG)
-- **Video** (play, pause, rewind, OGV format)
+- **Texture** (color key transparency, scaling, rotation, flipped, titled,  BMP, TGA, JPEG, PNG formats)
+- **Video** (play, pause, rewind, MPEG1 format)
 - **Sprite** (pages, groups, animation, poly-point collision)
-- **Entity** (defined from a sprite, position, scale, rotation, collision)
+- **Entity** (defined from a sprite, position, scale, rotation, collision) (coming soon!)
 - **Audio** (samples, streams, WAV, OGG/Vorbis, FLAC formats)
-- **Font** (true type, scale, rotate)
+- **Font** (true type format, scale, normal, italics, bold, strike-through styles)
 - **Timing** (time-based, frame elapsed, frame speed)
-- **Social** (post to all your social accounts, text and media, powered by <a href="https://dlvrit.com/" target="_blank">dlvrit.com</a>)
-- **Misc** (collision, easing, screen shake, screenshot, starfield, colors, INI based config files, startup dialog, treeview menu)
+- **Social** (post to all your social accounts, text and media, powered by <a href="https://dlvrit.com/" target="_blank">dlvrit.com</a>) (coming soon!)
+- **Misc** (collision, easing, screen shake, screenshot, starfield, colors, INI based config files, startup dialog, treeview menu) (coming soon!)
 - And more. See `Luna.pas` in `installdir\sources` and the docs in `installdir\docs` for more information about features.
 
 ## Minimum System Requirements
