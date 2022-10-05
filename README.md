@@ -60,8 +60,8 @@ Thank you very much for any support you can provide, I will be most grateful. :c
 ## How to use in Delphi
 - Unzip the archive to a desired location.
 - Add `installdir\sources`, folder to Delphi's library path so the library source files can be found for any project or for a specific project add to its search path.
-- Use `LuArc` utility for making archive files (compressed, encrypted custom format). Running the `makearc.bat` in `installdir\bin` will build `Data.arc` that is used by the examples.
-- In Delphi, load `Luna Game Toolkit.groupproj` to load and compile the examples, which will showcase the library features and how to use them.
+- Use `LuArc` utility for making archive files (compressed, encrypted custom format). Running the `makearc.bat` in `installdir\bin` will build `Data.arc` that is used by the examples. **Note:** You must build `Data.arc` before you run any examples, they all depend on it.
+- In Delphi, load `Luna Game Toolkit.groupproj` to load and compile the examples/LuArc, which will showcase the library features and how to use them.
 - See examples in the `installdir\examples` for more information about usage.
 
 ***NOTE: All executables in this repo that are created by us will be digitally signed as tinyBigGAMES LLC, for your protection and peace of mind.***

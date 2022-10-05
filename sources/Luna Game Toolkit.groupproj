@@ -1,0 +1,96 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C5677112-6011-4A3B-9974-F8887EF208E4}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="LuArc.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\1.basic\music\BasicMusic.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\1.basic\speech\BasicSpeech.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\1.basic\texture\BasicTexture.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\1.basic\video\BasicVideo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="LuArc">
+        <MSBuild Projects="LuArc.dproj"/>
+    </Target>
+    <Target Name="LuArc:Clean">
+        <MSBuild Projects="LuArc.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LuArc:Make">
+        <MSBuild Projects="LuArc.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicMusic">
+        <MSBuild Projects="..\examples\1.basic\music\BasicMusic.dproj"/>
+    </Target>
+    <Target Name="BasicMusic:Clean">
+        <MSBuild Projects="..\examples\1.basic\music\BasicMusic.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicMusic:Make">
+        <MSBuild Projects="..\examples\1.basic\music\BasicMusic.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicSpeech">
+        <MSBuild Projects="..\examples\1.basic\speech\BasicSpeech.dproj"/>
+    </Target>
+    <Target Name="BasicSpeech:Clean">
+        <MSBuild Projects="..\examples\1.basic\speech\BasicSpeech.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicSpeech:Make">
+        <MSBuild Projects="..\examples\1.basic\speech\BasicSpeech.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicTexture">
+        <MSBuild Projects="..\examples\1.basic\texture\BasicTexture.dproj"/>
+    </Target>
+    <Target Name="BasicTexture:Clean">
+        <MSBuild Projects="..\examples\1.basic\texture\BasicTexture.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicTexture:Make">
+        <MSBuild Projects="..\examples\1.basic\texture\BasicTexture.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicTiledTexture">
+        <MSBuild Projects="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj"/>
+    </Target>
+    <Target Name="BasicTiledTexture:Clean">
+        <MSBuild Projects="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicTiledTexture:Make">
+        <MSBuild Projects="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicVideo">
+        <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj"/>
+    </Target>
+    <Target Name="BasicVideo:Clean">
+        <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicVideo:Make">
+        <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="LuArc;BasicMusic;BasicSpeech;BasicTexture;BasicTiledTexture;BasicVideo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="LuArc:Clean;BasicMusic:Clean;BasicSpeech:Clean;BasicTexture:Clean;BasicTiledTexture:Clean;BasicVideo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="LuArc:Make;BasicMusic:Make;BasicSpeech:Make;BasicTexture:Make;BasicTiledTexture:Make;BasicVideo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
