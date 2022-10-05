@@ -30,13 +30,16 @@ if you wish to learn more about the Delphi language visit <a href="https://learn
 - **Input** (keyboard, mouse and joystick)
 - **Texture** (color key transparency, scaling, rotation, flipped, titled,  BMP, TGA, JPEG, PNG formats)
 - **Video** (play, pause, rewind, MPEG1 format)
-- **Sprite** (pages, groups, animation, poly-point collision)
+- **Sprite** (pages, groups, animation, poly-point collision) `coming soon!` 
 - **Entity** (defined from a sprite, position, scale, rotation, collision) `coming soon!`
-- **Audio** (samples, streams, WAV, OGG/Vorbis, FLAC formats)
+- **Actor** (high level, actor, actor list management) `coming soon!`
+- **Audio** (samples, streams, WAV, OGG, FLAC formats)
 - **Font** (true type format, scale, normal, italics, bold, strike-through styles)
 - **Timing** (time-based, frame elapsed, frame speed)
+- **CloudDb** (Remote MySQL database access via PHP)
+- **Highscore** (Post, retrieve, clear highscores to a remote MySQL database) `coming soon!`
 - **Social** (post to all your social accounts, text and media, powered by <a href="https://dlvrit.com/" target="_blank">dlvrit.com</a>) `coming soon!`
-- **Misc** (collision, easing, screen shake, screenshot, starfield, colors, INI based config files, startup dialog, treeview menu) `coming soon!`
+- **Misc** (collision, easing, screen shake, screenshot, starfield, INI based config files, startup dialog, treeview menu) `coming soon!`
 - And more. See `Luna.pas` in `installdir\sources` and the docs in `installdir\docs` for more information about features.
 
 ## Minimum System Requirements
