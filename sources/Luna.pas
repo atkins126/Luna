@@ -24465,11 +24465,9 @@ begin
   IMG_Init(IMG_INIT_JPG or IMG_INIT_PNG or IMG_INIT_TIF or IMG_INIT_WEBP);
   LMsg := string(SDL_GetError);
   if not LMsg.IsEmpty then
-  begin
-    Log('%s', [LMsg]);
-    Exit;
-  end;
-  Log('Initialized image support...', []);
+    Log('Warning: %s', [LMsg])
+  else
+    Log('Initialized image support...', []);
 
   if TTF_Init <> 0 then
   begin
@@ -24481,11 +24479,9 @@ begin
   Mix_Init(MIX_INIT_FLAC or MIX_INIT_MP3 or MIX_INIT_OGG or MIX_INIT_OPUS or MIX_INIT_MID);
   LMsg := string(SDL_GetError);
   if not LMsg.IsEmpty then
-  begin
-    Log('%s', [LMsg]);
-    Exit;
-  end;
-  Log('Initialized audio mixing support...', []);
+    Log('Warning: %s', [LMsg])
+  else
+    Log('Initialized audio mixing support...', []);
 
   if Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) <> 0 then
   begin
@@ -24507,8 +24503,11 @@ begin
   if not FInput.Startup then Exit;
   if not FVideo.Startup then Exit;
 
-  FArchive := TLuArchive.Create;
-  FArchive.Open(Settings.ArchivePassword, Settings.ArchiveFilename);
+  if TFile.Exists(Settings.ArchiveFilename) then
+  begin
+    FArchive := TLuArchive.Create;
+    FArchive.Open(Settings.ArchivePassword, Settings.ArchiveFilename);
+  end;
 
   OpenWindow(Settings.WindowTitle, Settings.WindowPosX, Settings.WindowPosY,
     Settings.WindowWidth,Settings.WindowHeight);
