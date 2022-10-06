@@ -14484,6 +14484,8 @@ type
     procedure Clear(aAttrs: TLuObjectAttributeSet);
   end;
 
+function GetConsoleWindow: hWnd; stdcall; external kernel32 name 'GetConsoleWindow';
+
 {$ENDREGION}
 
 {$REGION 'Luna.Color'}
@@ -14680,13 +14682,17 @@ type
     class operator Implicit(aValue: TLuPoint): SDL_FPoint;
     class operator Implicit(aValue: SDL_Point): TLuPoint;
     class operator Implicit(aValue: SDL_FPoint): TLuPoint;
+    {$IFDEF VER340}
     class operator Initialize(out aDest: TLuPoint);
+    {$ENDIF}
   end;
 
   PLuVector = ^TLuVector;
   TLuVector = record
     X,Y,Z,W: Single;
+    {$IFDEF VER340}
     class operator Initialize(out aDest: TLuVector);
+    {$ENDIF}
     constructor Create(aX: Single; aY: Single);
     procedure Assign(aX: Single; aY: Single); overload; inline;
     procedure Assign(aX: Single; aY: Single; aZ: Single); overload;
@@ -14717,7 +14723,9 @@ type
     class operator Implicit(aValue: TLuRect): SDL_FRect;
     class operator Implicit(aValue: SDL_Rect): TLuRect;
     class operator Implicit(aValue: SDL_FRect): TLuRect;
+    {$IFDEF VER340}
     class operator Initialize(out aDest: TLuRect);
+    {$ENDIF}
     constructor Create(aX: Single; aY: Single; aWidth: Single; aHeight: Single);
     procedure Assign(aX: Single; aY: Single; aWidth: Single; aHeight: Single); inline;
     function  Intersect(aRect: TLuRect): Boolean; inline;
@@ -21895,12 +21903,15 @@ begin
   Result.Y := aValue.y;
 end;
 
+{$IFDEF VER340}
 class operator TLuPoint.Initialize(out aDest: TLuPoint);
 begin
   aDest.X := 0;
   aDest.Y := 0;
 end;
+{$ENDIF}
 
+{$IFDEF VER340}
 class operator TLuVector.Initialize(out aDest: TLuVector);
 begin
   aDest.X := 0;
@@ -21908,6 +21919,7 @@ begin
   aDest.Z := 0;
   aDest.W := 0;
 end;
+{$ENDIF}
 
 constructor TLuVector.Create(aX: Single; aY: Single);
 begin
@@ -22112,6 +22124,7 @@ begin
   Result.Height := aValue.h;
 end;
 
+{$IFDEF VER340}
 class operator TLuRect.Initialize(out aDest: TLuRect);
 begin
   aDest.X := 0;
@@ -22119,6 +22132,7 @@ begin
   aDest.Width := 0;
   aDest.Height := 0;
 end;
+{$ENDIF}
 
 constructor TLuRect.Create(aX: Single; aY: Single; aWidth: Single; aHeight: Single);
 begin
@@ -22483,7 +22497,7 @@ begin
   LSubstituteWord := aSubstituteWord;
   if LWord.IsEmpty then Exit;
   if LSubstituteWord.IsEmpty then Exit;
-  FSubList.TryAdd(LWord, LSubstituteWord);
+  FSubList.AddOrSetValue(LWord, LSubstituteWord);
 end;
 
 {$ENDREGION}
@@ -24321,6 +24335,8 @@ end;
 procedure LuRunGame(const aGame: TLuGameClass);
 var
   LGame: TLuGame;
+  LMarshaller: TMarshaller;
+  LMsg: string;
 begin
   if not TLuGame.IsSingleInstance(TPath.GetFileName(ParamStr(0)) + ' - LGT_App') then
   begin
@@ -24365,7 +24381,8 @@ begin
   except
     on E: Exception do
     begin
-      TLuLogger.Fatal('%s: %s', [E.ClassName, E.Message]);
+      LMsg := Format('%s: %s', [E.ClassName, E.Message]);
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, 'Fatal Error', LMarshaller.AsUtf8(LMsg).ToPointer, nil);
     end;
   end;
 
