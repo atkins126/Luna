@@ -78,5 +78,5 @@ uses
   Luna in '..\..\..\sources\Luna.pas';
 
 begin
-  LuRunGame(TBaseTemplate);
+  LuRunGame(TBasicTemplate);
 end.

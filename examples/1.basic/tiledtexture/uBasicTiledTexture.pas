@@ -97,7 +97,7 @@ begin
   inherited;
 
   // Window
-  Settings.WindowTitle := 'Luna Game Toolkit - Basic Tiled Texture';
+  Settings.WindowTitle := 'Luna Game Toolkit - Tiled Texture [Basic]';
 
   // Archive
   Settings.ArchivePassword := '6aace89f6ed348bd836360345eeb5ad9';

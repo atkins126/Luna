@@ -95,7 +95,7 @@ begin
   inherited;
 
   // Window
-  Settings.WindowTitle := 'Luna Game Toolkit - Basic Speech';
+  Settings.WindowTitle := 'Luna Game Toolkit - Speech [Basic]';
 
   // Archive
   Settings.ArchivePassword := '6aace89f6ed348bd836360345eeb5ad9';

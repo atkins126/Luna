@@ -66,7 +66,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ============================================================================= }
 
-unit uBasicTemplate;
+unit uIntermediateTemplate;
 
 interface
 
@@ -76,8 +76,8 @@ uses
 
 type
 
-  { TBasicTemplate }
-  TBasicTemplate = class(TLuGame)
+  { TIntermediateTemplate }
+  TIntermediateTemplate = class(TLuGame)
   protected
   public
     procedure OnSetSettings; override;
@@ -98,20 +98,20 @@ type
 
 implementation
 
-{ TBasicTemplate }
-procedure TBasicTemplate.OnSetSettings;
+{ TIntermediateTemplate }
+procedure TIntermediateTemplate.OnSetSettings;
 begin
   inherited;
 
   // Window
-  Settings.WindowTitle := 'Luna Game Toolkit - Basic Template';
+  Settings.WindowTitle := 'Luna Game Toolkit - Intermediate Template';
 
   // Archive
   Settings.ArchivePassword := '6aace89f6ed348bd836360345eeb5ad9';
   Settings.ArchiveFilename := 'Data.arc';
 end;
 
-function  TBasicTemplate.OnStartup: Boolean;
+function  TIntermediateTemplate.OnStartup: Boolean;
 begin
   Result := False;
 
@@ -120,62 +120,62 @@ begin
   Result := True;
 end;
 
-procedure TBasicTemplate.OnShutdown;
+procedure TIntermediateTemplate.OnShutdown;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnReady(const aReady: Boolean);
+procedure TIntermediateTemplate.OnReady(const aReady: Boolean);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnClearWindow;
+procedure TIntermediateTemplate.OnClearWindow;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnUpdate(const aDeltaTime: Double);
+procedure TIntermediateTemplate.OnUpdate(const aDeltaTime: Double);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnFixedUpdate(const aFixedUpdateSpeed: Single);
+procedure TIntermediateTemplate.OnFixedUpdate(const aFixedUpdateSpeed: Single);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnRender;
+procedure TIntermediateTemplate.OnRender;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnRenderHud;
+procedure TIntermediateTemplate.OnRenderHud;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnShowWindow;
+procedure TIntermediateTemplate.OnShowWindow;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnSpeechWord(const aWord, aText: string);
+procedure TIntermediateTemplate.OnSpeechWord(const aWord, aText: string);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean);
+procedure TIntermediateTemplate.OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnVideoStatus(const aStatus: Cardinal; const aFilename: string);
+procedure TIntermediateTemplate.OnVideoStatus(const aStatus: Cardinal; const aFilename: string);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnRun;
+procedure TIntermediateTemplate.OnRun;
 begin
   inherited;
 end;

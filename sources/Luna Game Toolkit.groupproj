@@ -21,6 +21,9 @@
         <Projects Include="..\examples\1.basic\video\BasicVideo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -83,14 +86,23 @@
     <Target Name="BasicVideo:Make">
         <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="InterEntityCollision">
+        <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj"/>
+    </Target>
+    <Target Name="InterEntityCollision:Clean">
+        <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="InterEntityCollision:Make">
+        <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="LuArc;BasicMusic;BasicSpeech;BasicTexture;BasicTiledTexture;BasicVideo"/>
+        <CallTarget Targets="LuArc;BasicMusic;BasicSpeech;BasicTexture;BasicTiledTexture;BasicVideo;InterEntityCollision"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="LuArc:Clean;BasicMusic:Clean;BasicSpeech:Clean;BasicTexture:Clean;BasicTiledTexture:Clean;BasicVideo:Clean"/>
+        <CallTarget Targets="LuArc:Clean;BasicMusic:Clean;BasicSpeech:Clean;BasicTexture:Clean;BasicTiledTexture:Clean;BasicVideo:Clean;InterEntityCollision:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="LuArc:Make;BasicMusic:Make;BasicSpeech:Make;BasicTexture:Make;BasicTiledTexture:Make;BasicVideo:Make"/>
+        <CallTarget Targets="LuArc:Make;BasicMusic:Make;BasicSpeech:Make;BasicTexture:Make;BasicTiledTexture:Make;BasicVideo:Make;InterEntityCollision:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

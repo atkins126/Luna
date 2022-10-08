@@ -66,7 +66,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ============================================================================= }
 
-unit uBasicTemplate;
+unit uInterEntityCollision;
 
 interface
 
@@ -76,9 +76,13 @@ uses
 
 type
 
-  { TBasicTemplate }
-  TBasicTemplate = class(TLuGame)
+  { TInterEntityCollision }
+  TInterEntityCollision = class(TLuGame)
   protected
+    FBoss: TLuEntity;
+    FFigure: TLuEntity;
+    FHitPos: TLuVector;
+    FCollide: Boolean;
   public
     procedure OnSetSettings; override;
     function  OnStartup: Boolean; override;
@@ -98,84 +102,131 @@ type
 
 implementation
 
-{ TBasicTemplate }
-procedure TBasicTemplate.OnSetSettings;
+{ TInterEntityCollision }
+procedure TInterEntityCollision.OnSetSettings;
 begin
   inherited;
 
   // Window
-  Settings.WindowTitle := 'Luna Game Toolkit - Basic Template';
+  Settings.WindowTitle := 'Luna Game Toolkit - Entity Collision [Intermediate]';
 
   // Archive
   Settings.ArchivePassword := '6aace89f6ed348bd836360345eeb5ad9';
   Settings.ArchiveFilename := 'Data.arc';
 end;
 
-function  TBasicTemplate.OnStartup: Boolean;
+function  TInterEntityCollision.OnStartup: Boolean;
 begin
   Result := False;
 
   if not inherited then Exit;
 
+  Sprite.LoadPage(Archive, 'arc/images/boss.png', nil);
+  Sprite.AddGroup;
+  Sprite.AddImageFromGrid(0, 0, 0, 0, 128, 128);
+  Sprite.AddImageFromGrid(0, 0, 1, 0, 128, 128);
+  Sprite.AddImageFromGrid(0, 0, 0, 1, 128, 128);
+
+  Sprite.LoadPage(Archive, 'arc/images/figure.png', nil);
+  Sprite.AddGroup;
+  Sprite.AddImageFromGrid(1, 1, 0, 0, 128, 128);
+
+
+  FBoss := TLuEntity.Create;
+  FBoss.Init(Sprite, 0);
+  FBoss.SetFrameFPS(14);
+  FBoss.SetPosAbs(Settings.WindowWidth/2, (Settings.WindowHeight/2)-128);
+  FBoss.TracePolyPoint(6, 12, 70, nil);
+  FBoss.SetRenderPolyPoint(True);
+
+  FFigure := TLuEntity.Create;
+  FFigure.Init(Sprite, 1);
+  FFigure.SetFrameFPS(14);
+  FFigure.SetPosAbs(Settings.WindowWidth/2, Settings.WindowHeight/2);
+  FFigure.TracePolyPoint(6, 12, 70, nil);
+  FFigure.SetRenderPolyPoint(True);
+
   Result := True;
 end;
 
-procedure TBasicTemplate.OnShutdown;
+procedure TInterEntityCollision.OnShutdown;
+begin
+  FreeNilObject(FFigure);
+  FreeNilObject(FBoss);
+
+  inherited;
+end;
+
+procedure TInterEntityCollision.OnReady(const aReady: Boolean);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnReady(const aReady: Boolean);
+procedure TInterEntityCollision.OnClearWindow;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnClearWindow;
+procedure TInterEntityCollision.OnUpdate(const aDeltaTime: Double);
+begin
+  inherited;
+
+  FBoss.NextFrame;
+  FBoss.ThrustToPos(30*50, 14*50, MousePos.X, MousePos.Y, 128, 32, 5*50, cLuEPSILON, aDeltaTime);
+  if FBoss.CollidePolyPoint(FFigure, FHitPos) then
+    FCollide := True
+  else
+    FCollide := False;
+
+  FFigure.NextFrame;
+  FHitPos.Z :=  FHitPos.Z + (30.0 * aDeltaTime);
+  ClipValuef(FHitPos.Z, 0, 359, True);
+  FFigure.RotateAbs(FHitPos.Z);
+
+end;
+
+procedure TInterEntityCollision.OnFixedUpdate(const aFixedUpdateSpeed: Single);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnUpdate(const aDeltaTime: Double);
+procedure TInterEntityCollision.OnRender;
+begin
+  inherited;
+
+  FFigure.Render(0, 0);
+  FBoss.Render(0, 0);
+  if FCollide then
+    DrawFilledRect(FHitPos.X, FHitPos.Y, 10, 10, cLuRed);
+
+end;
+
+procedure TInterEntityCollision.OnRenderHud;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnFixedUpdate(const aFixedUpdateSpeed: Single);
+procedure TInterEntityCollision.OnShowWindow;
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnRender;
+procedure TInterEntityCollision.OnSpeechWord(const aWord, aText: string);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnRenderHud;
+procedure TInterEntityCollision.OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnShowWindow;
+procedure TInterEntityCollision.OnVideoStatus(const aStatus: Cardinal; const aFilename: string);
 begin
   inherited;
 end;
 
-procedure TBasicTemplate.OnSpeechWord(const aWord, aText: string);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnVideoStatus(const aStatus: Cardinal; const aFilename: string);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnRun;
+procedure TInterEntityCollision.OnRun;
 begin
   inherited;
 end;

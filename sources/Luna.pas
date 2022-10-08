@@ -14682,17 +14682,11 @@ type
     class operator Implicit(aValue: TLuPoint): SDL_FPoint;
     class operator Implicit(aValue: SDL_Point): TLuPoint;
     class operator Implicit(aValue: SDL_FPoint): TLuPoint;
-    {$IFDEF VER340}
-    class operator Initialize(out aDest: TLuPoint);
-    {$ENDIF}
   end;
 
   PLuVector = ^TLuVector;
   TLuVector = record
     X,Y,Z,W: Single;
-    {$IFDEF VER340}
-    class operator Initialize(out aDest: TLuVector);
-    {$ENDIF}
     constructor Create(aX: Single; aY: Single);
     procedure Assign(aX: Single; aY: Single); overload; inline;
     procedure Assign(aX: Single; aY: Single; aZ: Single); overload;
@@ -14723,9 +14717,6 @@ type
     class operator Implicit(aValue: TLuRect): SDL_FRect;
     class operator Implicit(aValue: SDL_Rect): TLuRect;
     class operator Implicit(aValue: SDL_FRect): TLuRect;
-    {$IFDEF VER340}
-    class operator Initialize(out aDest: TLuRect);
-    {$ENDIF}
     constructor Create(aX: Single; aY: Single; aWidth: Single; aHeight: Single);
     procedure Assign(aX: Single; aY: Single; aWidth: Single; aHeight: Single); inline;
     function  Intersect(aRect: TLuRect): Boolean; inline;
@@ -15435,6 +15426,236 @@ type
 
 {$ENDREGION}
 
+{$REGION 'Luna.Polygon'}
+type
+
+
+  TPolygon = class(TLuBaseObject)
+  protected
+  type
+    TSegment = record
+      Point: TLuVector;
+      Visible: Boolean;
+    end;
+  protected
+    FSegment   : array of TSegment;
+    FWorldPoint: array of TLuVector;
+    FItemCount : Integer;
+    procedure Clear;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Save(const aFilename: string);
+    procedure Load(const aArchive: TLuArchive; const aFilename: string);
+    procedure CopyFrom(const aPolygon: TPolygon);
+    procedure AddLocalPoint(const aX, aY: Single; const aVisible: Boolean);
+    function  Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
+    procedure Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
+    procedure SetSegmentVisible(const aIndex: Integer; const aVisible: Boolean);
+    function  SegmentVisible(const aIndex: Integer): Boolean;
+    function  PointCount: Integer;
+    function  WorldPoint(const aIndex: Integer): PLuVector;
+    function  LocalPoint(const aIndex: Integer): PLuVector;
+  end;
+
+{$ENDREGION}
+
+{$REGION 'Luna.Sprite'}
+type
+
+  TLuPolyPoint = class;
+  TLuSprite = class;
+
+  TLuPolypointTrace = record
+  private class var
+  const
+    Neighbours: array [1 .. 8, 1 .. 2] of Integer = ((0, -1), (-1, 0), (0, 1),
+      (1, 0), (-1, -1), (-1, 1), (1, 1), (1, -1));
+  type
+    TR_Point = record
+      X, Y: Integer;
+    end;
+  private class var
+    PolyArr: array of TR_Point;
+    PntCount: Integer;
+    Mju: Extended;
+    MaxStepBack: Integer;
+    AlphaThreshold: Byte; // alpha channel threshhold
+    class function  IsNeighbour(X1, Y1, X2, Y2: Integer): Boolean; static;
+    class function  IsPixEmpty(Tex: TLuTexture; X, Y, W, H: Integer): Boolean; static;
+    class procedure FindStartingPoint(Tex: TLuTexture; var X, Y: Integer; W, H: Integer); static;
+    class function  CountEmptyAround(Tex: TLuTexture; X, Y, W, H: Integer): Integer; static;
+    class function  FindNearestButNotNeighbourOfOther(Tex: TLuTexture; Xs, Ys, XOther, YOther: Integer; var XF, YF: Integer; W, H: Integer): Boolean; static;
+    class function  LineLength(X1, Y1, X2, Y2: Integer): Extended; static;
+    class function  TriangleThinness(X1, Y1, X2, Y2, X3, Y3: Integer): Extended; static;
+    class function  IsInList(X, Y: Integer): Boolean; static;
+  public
+    class procedure Init(aMju: Extended=6; aMaxStepBack: Integer=10; aAlphaThreshold: Byte=70); static;
+    class procedure Done; static;
+    class procedure AddPoint(X, Y: Integer); static;
+    class procedure DelPoint(Index: Integer); static;
+    class function  GetPointCount: Integer; static;
+    class procedure PrimaryTrace(const Tex: TLuTexture; const W, H: Integer); static;
+    class procedure SimplifyPoly; static;
+    class procedure ApplyPolyPoint(aPolyPoint: TLuPolyPoint; aNum: Integer; aOrigin: PLuVector); static;
+  end;
+
+  TLuPolyPoint = class(TLuBaseObject)
+  protected
+    FPolygon: array of TPolygon;
+    FCount  : Integer;
+    procedure Clear;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Save(const aFilename: string);
+    procedure Load(const aArchive: TLuArchive; const aFilename: string);
+    procedure CopyFrom(const aPolyPoint: TLuPolyPoint);
+    procedure AddPoint(const aNum: Integer; const aX, aY: Single; const aOrigin: PLuVector);
+    function  TraceFromTexture(const aTexture: TLuTexture; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector): Integer;
+    procedure TraceFromSprite(const aSprite: TLuSprite; const aGroup: Integer; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector);
+    function  Count: Integer;
+    procedure Render(const aNum: Integer; aX, aY, aScale, aAngle: Single; const aColor: TLuColor; const aFlipMode: Integer; const aOrigin: PLuVector);
+    function  Collide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
+      const aPolyPoint2: TLuPolyPoint; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer;
+      const aOrigin2: PLuVector; var aHitPos: TLuVector): Boolean;
+    function  CollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
+    function  Polygon(const aNum: Integer): TPolygon;
+    function  Valid(const aNum: Integer): Boolean;
+  end;
+
+  TLuSprite = class(TLuBaseObject)
+  protected
+  type
+    PSpriteImageRect = ^TSpriteImageRect;
+    TSpriteImageRect = record
+      Rect: TLuRect;
+      Page: Integer;
+    end;
+
+    PSpriteGroup = ^TSpriteGroup;
+    TSpriteGroup = record
+      Image: array of TSpriteImageRect;
+      Count: Integer;
+      PolyPoint: TLuPolypoint;
+    end;
+  protected
+    FTexture: array of TLuTexture;
+    FGroup: array of TSpriteGroup;
+    FPageCount: Integer;
+    FGroupCount: Integer;
+    procedure Clear;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    function  LoadPage(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor): Integer;
+    function  AddGroup: Integer;
+    function  AddImageFromRect(const aPage, aGroup: Integer; const aRect: TLuRect): Integer;
+    function  AddImageFromGrid(const aPage, aGroup, aGridX, aGridY, aGridWidth: Integer; aGridHeight: Integer): Integer;
+    function  ImageCount(const aGroup: Integer): Integer;
+    function  ImageWidth(const aNum, aGroup: Integer): Single;
+    function  ImageHeight(const aNum, aGroup: Integer): Single;
+    function  ImageTexture(const aNum, aGroup: Integer): TLuTexture;
+    procedure RenderImage(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal; const aRenderPolyPoint: Boolean=false);
+    function  ImageRect(const aNum, aGroup: Integer): TLuRect;
+    function  GroupPolyPoint(const aGroup: Integer): Pointer;
+    procedure GroupPolyPointTrace(const aGroup: Integer; const aMju: Single=6; const aMaxStepBack: Integer=12; const aAlphaThreshold: Integer=70; const aOrigin: PLuVector=nil);
+    function  GroupPolyPointCollide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
+      const aSprite2: TLuSprite; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer; const aOrigin2: PLuVector;
+      const aShrinkFactor: Single; var aHitPos: TLuVector): Boolean;
+    function  GroupPolyPointCollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector;
+      const aShrinkFactor: Single; var aPoint: TLuVector): Boolean;
+  end;
+
+{$ENDREGION}
+
+{$REGION 'Luna.Entity'}
+type
+
+  TLuEntity = class(TLuBaseObject)
+  protected
+    FSprite      : TLuSprite;
+    FGroup       : Integer;
+    FFrame       : Integer;
+    FFrameFPS    : Single;
+    FFrameTimer  : Single;
+    FPos         : TLuVector;
+    FDir         : TLuVector;
+    FScale       : Single;
+    FAngle       : Single;
+    FAngleOffset : Single;
+    FColor       : TLuColor;
+    FFlipMode    : Integer;
+    FLoopFrame   : Boolean;
+    FWidth       : Single;
+    FHeight      : Single;
+    FRadius      : Single;
+    FFirstFrame  : Integer;
+    FLastFrame   : Integer;
+    FShrinkFactor: Single;
+    FOrigin      : TLuVector;
+    FRenderPolyPoint: Boolean;
+    FBlendMode: Cardinal;
+  public
+    property BlendMode: Cardinal read FBlendMode write FBlendMode;
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Init(aSprite: TLuSprite; aGroup: Integer);
+    procedure SetFrameRange(aFirst: Integer; aLast: Integer);
+    function  NextFrame: Boolean;
+    function  PrevFrame: Boolean;
+    function  Frame: Integer;
+    procedure SetFrame(aFrame: Integer);
+    function  FrameFPS: Single;
+    procedure SetFrameFPS(aFrameFPS: Single);
+    function  FirstFrame: Integer;
+    function  LastFrame: Integer;
+    procedure SetPosAbs(aX: Single; aY: Single);
+    procedure SetPosRel(aX: Single; aY: Single);
+    function  Pos: TLuVector;
+    function  Dir: TLuVector;
+    procedure ScaleAbs(aScale: Single);
+    procedure ScaleRel(aScale: Single);
+    function  Angle: Single;
+    function  AngleOffset: Single;
+    procedure SetAngleOffset(aAngle: Single);
+    procedure RotateAbs(aAngle: Single);
+    procedure RotateRel(aAngle: Single);
+    function  RotateToAngle(aAngle: Single; aSpeed: Single): Boolean;
+    function  RotateToPos(aX: Single; aY: Single; aSpeed: Single): Boolean;
+    function  RotateToPosAt(aSrcX: Single; aSrcY: Single; aDestX: Single; aDestY: Single; aSpeed: Single): Boolean;
+    procedure Thrust(aSpeed: Single);
+    procedure ThrustAngle(aAngle: Single; aSpeed: Single);
+    function  ThrustToPos(aThrustSpeed: Single; aRotSpeed: Single; aDestX: Single; aDestY: Single; aSlowdownDist: Single; aStopDist: Single; aStopSpeed: Single; aStopSpeedEpsilon: Single; aDeltaTime: Single): Boolean;
+    function  Visible(aVirtualX: Single; aVirtualY: Single): Boolean;
+    function  FullyVisible(aVirtualX: Single; aVirtualY: Single): Boolean;
+    function  Overlap(aX: Single; aY: Single; aRadius: Single; aShrinkFactor: Single): Boolean; overload;
+    function  Overlap(aEntity: TLuEntity): Boolean; overload;
+    procedure Render(aVirtualX: Single; aVirtualY: Single);
+    procedure RenderAt(aX: Single; aY: Single);
+    procedure TracePolyPoint(aMju: Single=6; aMaxStepBack: Integer=12; aAlphaThreshold: Integer=70; aOrigin: PLuVector=nil);
+    function  CollidePolyPoint(aEntity: TLuEntity; var aHitPos: TLuVector): Boolean;
+    function  CollidePolyPointPoint(var aPoint: TLuVector): Boolean;
+    function  Sprite: TLuSprite;
+    function  Group: Integer;
+    function  Scale: Single;
+    function  Color: TLuColor;
+    procedure SetColor(aColor: TLuColor);
+    function  FlipMode: Integer;
+    procedure SetFlipMode(aFlipMode: Integer);
+    function  LoopFrame: Boolean;
+    procedure SetLoopFrame(aLoop: Boolean);
+    function  Width: Single;
+    function  Height: Single;
+    function  Radius: Single;
+    function  ShrinkFactor: Single;
+    procedure SetShrinkFactor(aShrinkFactor: Single);
+    procedure SetRenderPolyPoint(aValue: Boolean);
+  end;
+
+
+{$ENDREGION}
+
 {$REGION 'Luna.Game'}
 type
   TLuGame = class
@@ -15484,12 +15705,16 @@ type
     FInput: TLuInput;
     FVideo: TVideo;
     FArchive: TLuArchive;
+    FSprite: TLuSprite;
     FDefaultFont: TLuFont;
+    FMousePos: TLuVector;
   public
     property Marshaller: TMarshaller read FMarshaller;
     property MasterObjectList: TLuBaseObjectList read FMasterObjectList;
     property Archive: TLuArchive read FArchive;
+    property Sprite: TLuSprite read FSprite;
     property DefaultFont: TLuFont read FDefaultFont;
+    property MousePos: TLuVector read FMousePos;
 
     constructor Create; virtual;
     destructor Destroy; override;
@@ -21903,24 +22128,6 @@ begin
   Result.Y := aValue.y;
 end;
 
-{$IFDEF VER340}
-class operator TLuPoint.Initialize(out aDest: TLuPoint);
-begin
-  aDest.X := 0;
-  aDest.Y := 0;
-end;
-{$ENDIF}
-
-{$IFDEF VER340}
-class operator TLuVector.Initialize(out aDest: TLuVector);
-begin
-  aDest.X := 0;
-  aDest.Y := 0;
-  aDest.Z := 0;
-  aDest.W := 0;
-end;
-{$ENDIF}
-
 constructor TLuVector.Create(aX: Single; aY: Single);
 begin
   Assign(aX, aY);
@@ -22123,16 +22330,6 @@ begin
   Result.Width := aValue.w;
   Result.Height := aValue.h;
 end;
-
-{$IFDEF VER340}
-class operator TLuRect.Initialize(out aDest: TLuRect);
-begin
-  aDest.X := 0;
-  aDest.Y := 0;
-  aDest.Width := 0;
-  aDest.Height := 0;
-end;
-{$ENDIF}
 
 constructor TLuRect.Create(aX: Single; aY: Single; aWidth: Single; aHeight: Single);
 begin
@@ -23271,10 +23468,13 @@ begin
   SDL_QueryTexture(FHandle, nil, nil, @FWidth, @FHeight);
 end;
 
+
 procedure TLuTexture.Load(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor);
 var
   LRWops: PSDL_RWops;
   LHandle: PSDL_Texture;
+  destsurface,srcsurface: PSDL_Surface;
+  LPixelFormat: PSDL_PixelFormat;
 begin
   if Assigned(aArchive) then
     LRWops := aArchive.GetRWops(aFilename)
@@ -23282,14 +23482,30 @@ begin
     LRWops := Game.GetFileRWops(aFilename);
   if not Assigned(LRWops) then Exit;
 
-  LHandle := IMG_LoadTexture_RW(Game.GEtWindowRendererHandle, LRWops, SDL_true);
-  if not Assigned(LHandle) then Exit;
+  srcsurface := IMG_Load_RW(LRWops, SDL_True);
+  if not Assigned(srcsurface) then Exit;
 
-  FPixelFormat := SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
+  if aColorKey <> nil then
+   begin
+    SDL_SetColorKey(srcsurface, 1, SDL_MapRGB(srcsurface.format, aColorKey.Red,
+      aColorKey.Green, aColorKey.Blue));
+   end;
+
+  LPixelFormat := SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
+  destsurface := SDL_ConvertSurface(srcsurface, LPixelFormat, 0);
+  SDL_FreeSurface(srcsurface);
+
+  LHandle := SDL_CreateTexture(Game.GetWindowRendererHandle,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING, destsurface.w, destsurface.h);
+  SDL_LockSurface(destsurface);
+  SDL_UpdateTexture(LHandle, nil, destsurface.pixels, destsurface.pitch);
+  SDL_UnlockSurface(destsurface);
+
+  SDL_FreeSurface(destsurface);
 
   Unload;
 
   FHandle := LHandle;
+  FPixelFormat := LPixelFormat;
 
   SDL_SetTextureBlendMode(FHandle, SDL_BLENDMODE_BLEND);
   SDL_QueryTexture(FHandle, nil, nil, @FWidth, @FHeight);
@@ -23312,8 +23528,7 @@ end;
 
 procedure TLuTexture.Render(const aSrcRect: PLuRect; const aX, aY: Single; aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal);
 var
-  srcrect: SDL_FRect;
-  dstrect: SDL_FRect;
+  srcrect,dstrect: SDL_Rect;
   X, Y, w, h: Single;
 begin
   X := 0;
@@ -23326,10 +23541,10 @@ begin
 
   if aSrcRect <> nil then
   begin
-    srcrect.x := aSrcRect.x;
-    srcrect.y := aSrcRect.y;
-    srcrect.w := aSrcRect.width;
-    srcrect.h := aSrcRect.height;
+    srcrect.x := Round(aSrcRect.x);
+    srcrect.y := Round(aSrcRect.y);
+    srcrect.w := Round(aSrcRect.width);
+    srcrect.h := Round(aSrcRect.height);
   end;
 
   if aOrigin <> nil then
@@ -23349,17 +23564,17 @@ begin
   w := srcrect.w * aScale;
   h := srcrect.h * aScale;
 
-  dstrect.X := aX - w * X;
-  dstrect.Y := aY - h * Y;
-  dstrect.w := w;
-  dstrect.h := h;
+  dstrect.X := Round(aX - w * X);
+  dstrect.Y := Round(aY - h * Y);
+  dstrect.w := Round(w);
+  dstrect.h := Round(h);
 
   SDL_SetTextureColorMod(FHandle, aColor.Red, aColor.Green, aColor.BLue);
   SDL_SetTextureAlphaMod(FHandle, aColor.Alpha);
 
   SDL_SetTextureBlendMode(FHandle, aBlendMode);
 
-  SDL_RenderCopyExF(Game.GetWindowRendererHandle, FHandle, @srcrect, @dstrect, aAngle, nil, aFlipMode);
+  SDL_RenderCopyEx(Game.GetWindowRendererHandle, FHandle, @srcrect, @dstrect, aAngle, nil, aFlipMode);
 end;
 
 procedure TLuTexture.RenderTiled(const aDeltaX, aDeltaY: Single; const aColor: TLuColor; const aBlendMode: Cardinal);
@@ -23467,9 +23682,11 @@ var
   p: PCardinal;
   LX, LY: Integer;
 begin
+  Result := cLuBlank;
+
   LX := aX;
   LY := aY;
-  Result := cLuBlank;
+
   if (LX < 0) or (LX > FLockRect.Width-1)  or
      (LY < 0) or (LY > FLockRect.Height-1) or
      (FPixels = nil)  then
@@ -23480,6 +23697,7 @@ begin
 
   p := FPixels;
   Inc(p, (LY * FWidth) + LX);
+
   SDL_GetRGBA(p^, FPixelFormat, @Result.Red, @Result.Green, @Result.BLue, @Result.Alpha);
 end;
 
@@ -23565,7 +23783,7 @@ begin
     Exit;
   end;
 
-  LFlags := LFlags or SDL_RENDERER_ACCELERATED {or SDL_RENDERER_PRESENTVSYNC};
+  LFlags := LFlags or SDL_RENDERER_ACCELERATED;
   SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, '2' );
   SDL_SetHint(SDL_HINT_RENDER_BATCHING, '1');
   SDL_SetHint(SDL_HINT_RENDER_DRIVER, 'direct3d');
@@ -24331,6 +24549,1448 @@ end;
 
 {$ENDREGION}
 
+{$REGION 'Luna.Polygon'}
+procedure TPolygon.Clear;
+begin
+  FSegment := nil;
+  FWorldPoint := nil;
+  FItemCount := 0;
+end;
+
+constructor TPolygon.Create;
+begin
+  inherited;
+  Clear;
+end;
+
+destructor TPolygon.Destroy;
+begin
+  inherited;
+  Clear;
+end;
+
+procedure TPolygon.Save(const aFilename: string);
+var
+  Size: Integer;
+  fs: TFileStream;
+begin
+  fs := TFile.Create(aFilename);
+  try
+    fs.WriteData(@FItemCount, SizeOf(FItemCount));
+
+    Size := SizeOf(FSegment[0]) * FItemCount;
+    fs.WriteData(FSegment, Size);
+
+    Size := SizeOf(FWorldPoint[0]) * FItemCount;
+    fs.WriteData(FWorldPoint, Size);
+
+  finally
+    Game.FreeNilObject(fs);
+  end;
+end;
+
+procedure TPolygon.Load(const aArchive: TLuArchive; const aFilename: string);
+var
+  LSize: Integer;
+  LRWops: PSDL_RWops;
+begin
+
+  if Assigned(aArchive) then
+    LRWops := aArchive.GetRWops(aFilename)
+  else
+    LRWops := Game.GetFileRWops(aFilename);
+
+  Clear;
+
+  SDL_RWread(LRWops, @FItemCount, SizeOf(FItemCount), 1);
+
+  SetLength(FSegment, FItemCount);
+  LSize := SizeOf(FSegment[0]) * FItemCount;
+  SDL_RWread(LRWops, FSegment, LSize, 1);
+
+  SetLength(FWorldPoint, FItemCount);
+  LSize := SizeOf(FWorldPoint[0]) * FItemCount;
+  SDL_RWread(LRWops, FWorldPoint, LSize, 1);
+
+  SDL_RWclose(LRWops);
+end;
+
+procedure TPolygon.CopyFrom(const aPolygon: TPolygon);
+var
+  I: Integer;
+begin
+  Clear;
+  for I := 0 to FItemCount-1 do
+  begin
+    with FSegment[I] do
+    begin
+      AddLocalPoint(Point.X, Point.Y, Visible);
+    end;
+  end;
+end;
+
+
+procedure TPolygon.AddLocalPoint(const aX, aY: Single; const aVisible: Boolean);
+begin
+  Inc(FItemCount);
+  SetLength(FSegment, FItemCount);
+  SetLength(FWorldPoint, FItemCount);
+  FSegment[FItemCount-1].Point.X := aX;
+  FSegment[FItemCount-1].Point.Y := aY;
+  FSegment[FItemCount-1].Visible := aVisible;
+  FWorldPoint[FItemCount-1].X := 0;
+  FWorldPoint[FItemCount-1].Y := 0;
+end;
+
+function  TPolygon.Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
+var
+  I: Integer;
+  P: TLuVector;
+begin
+  Result := False;
+
+  if FItemCount < 2 then Exit;
+
+  for I := 0 to FItemCount-1 do
+  begin
+    P.X := FSegment[I].Point.X;
+    P.Y := FSegment[I].Point.Y;
+
+    if aOrigin <> nil then
+    begin
+      P.X := P.X - aOrigin.X;
+      P.Y := P.Y - aOrigin.Y;
+    end;
+
+    case aFlipMode of
+      cLuFLIP_NONE:
+        begin
+        end;
+
+      cLuFLIP_VERTICAL:
+        begin
+          P.Y := -P.Y;
+        end;
+
+      cLuFLIP_HORIZONTAL:
+        begin
+          P.X := -P.X;
+        end;
+    end;
+
+    P.X := P.X * aScale;
+    P.Y := P.Y * aScale;
+
+    Game.AngleRotatePos(aAngle, P.X, P.Y);
+
+    P.X := P.X + aX;
+    P.Y := P.Y + aY;
+
+    FWorldPoint[I].X := P.X;
+    FWorldPoint[I].Y := P.Y;
+  end;
+
+  Result := True;
+end;
+
+procedure TPolygon.Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
+var
+  I: Integer;
+  X0,Y0,X1,Y1: Integer;
+begin
+  if not Transform(aX, aY, aScale, aAngle, aFlipMode, aOrigin) then Exit;
+
+  for I := 0 to FItemCount-2 do
+  begin
+    if FSegment[I].Visible then
+    begin
+      X0 := Round(FWorldPoint[I].X);
+      Y0 := Round(FWorldPoint[I].Y);
+      X1 := Round(FWorldPoint[I+1].X);
+      Y1 := Round(FWorldPoint[I+1].Y);
+      Game.DrawLine(X0, Y0, X1, Y1, aColor);
+    end;
+  end;
+end;
+
+procedure TPolygon.SetSegmentVisible(const aIndex: Integer; const aVisible: Boolean);
+begin
+  FSegment[aIndex].Visible := True;
+end;
+
+function  TPolygon.SegmentVisible(const aIndex: Integer): Boolean;
+begin
+  Result := FSegment[aIndex].Visible;
+end;
+
+function  TPolygon.PointCount: Integer;
+begin
+  Result := FItemCount;
+end;
+
+function  TPolygon.WorldPoint(const aIndex: Integer): PLuVector;
+begin
+  Result := @FWorldPoint[aIndex];
+end;
+
+function  TPolygon.LocalPoint(const aIndex: Integer): PLuVector;
+begin
+  Result := @FSegment[aIndex].Point;
+end;
+
+
+{$ENDREGION}
+
+{$REGION 'Luna.Sprite'}
+class function TLuPolypointTrace.IsNeighbour(X1, Y1, X2, Y2: Integer): Boolean;
+begin
+  Result := (Abs(X2 - X1) <= 1) and (Abs(Y2 - Y1) <= 1);
+end;
+
+class function TLuPolypointTrace.IsPixEmpty(Tex: TLuTexture; X, Y, W, H: Integer): Boolean;
+var
+  Color: TLuColor;
+begin
+  if (X < 0) or (Y < 0) or (X > W - 1) or (Y > H - 1) then
+    Result := true
+  else
+  begin
+    Color := Tex.GetPixel(X, Y);
+    Result := Boolean(Color.Alpha < AlphaThreshold);
+  end;
+end;
+
+class procedure TLuPolypointTrace.FindStartingPoint(Tex: TLuTexture; var X, Y: Integer; W, H: Integer);
+var
+  I, J: Integer;
+begin
+  X := 1000000; // init X and Y with huge values
+  Y := 1000000;
+  I := 0;
+  J := 0;
+  while (X = 1000000) and (I <= H) do
+  begin
+    if not IsPixEmpty(Tex, I, J, W, H) then
+    begin
+      X := I;
+      Y := J;
+    end;
+    Inc(I);
+    if I = W then
+    begin
+      I := 0;
+      Inc(J);
+    end;
+  end;
+  if X = 1000000 then
+  begin
+    Game.Log('do something awful - texture is empty!', []);
+    Halt;
+  end;
+end;
+
+class function  TLuPolypointTrace.CountEmptyAround(Tex: TLuTexture; X, Y, W, H: Integer): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 1 to 8 do
+    if IsPixEmpty(Tex, X + Neighbours[I, 1], Y + Neighbours[I, 2], W, H) then
+      Inc(Result);
+end;
+
+class function  TLuPolypointTrace.FindNearestButNotNeighbourOfOther(Tex: TLuTexture; Xs, Ys, XOther, YOther: Integer; var XF, YF: Integer; W, H: Integer): Boolean;
+var
+  I, MaxEmpty, E: Integer;
+  Xt, Yt: Integer;
+begin
+  MaxEmpty := 0;
+  Result := False;
+  for I := 1 to 8 do
+  begin
+    Xt := Xs + Neighbours[I, 1];
+    Yt := Ys + Neighbours[I, 2];
+    if (not IsInList(Xt, Yt)) and (not IsNeighbour(Xt, Yt, XOther, YOther)) and
+      (not IsPixEmpty(Tex, Xt, Yt, W, H)) then
+    begin
+      E := CountEmptyAround(Tex, Xt, Yt, W, H); // ok. count empties around
+      if E > MaxEmpty then // the best choice point has max empty neighbours
+      begin
+        XF := Xt;
+        YF := Yt;
+        MaxEmpty := E;
+        Result := true;
+      end;
+    end;
+  end;
+end;
+
+class function TLuPolypointTrace.LineLength(X1, Y1, X2, Y2: Integer): Extended;
+var
+  A, B: Integer;
+begin
+  A := Abs(X2 - X1);
+  B := Abs(Y2 - Y1);
+  Result := Sqrt(A * A + B * B);
+end;
+
+class function TLuPolypointTrace.TriangleThinness(X1, Y1, X2, Y2, X3, Y3: Integer): Extended;
+var
+  P: Extended;
+  A, B, C, S: Extended;
+begin
+  A := LineLength(X1, Y1, X2, Y2);
+  B := LineLength(X2, Y2, X3, Y3);
+  C := LineLength(X3, Y3, X1, Y1);
+  P := A + B + C;
+  S := Sqrt(P * (P - A) * (P - B) * (P - C));
+  Result := S / P;
+end;
+
+class function TLuPolypointTrace.IsInList(X, Y: Integer): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 0 to PntCount - 1 do
+  begin
+    Result := (PolyArr[I].X = X) and (PolyArr[I].Y = Y);
+    if Result then
+      Break;
+  end;
+end;
+
+class procedure TLuPolypointTrace.Init(aMju: Extended; aMaxStepBack: Integer; aAlphaThreshold: Byte);
+begin
+  Done;
+  Mju := aMju;
+  MaxStepBack := aMaxStepBack;
+  AlphaThreshold := aAlphaThreshold;
+end;
+
+class procedure TLuPolypointTrace.Done;
+begin
+  PntCount := 0;
+  PolyArr := nil;
+end;
+
+class procedure TLuPolypointTrace.AddPoint(X, Y: Integer);
+var
+  L: Integer;
+begin
+  Inc(PntCount);
+  L := High(PolyArr) + 1;
+  if L < PntCount then
+    SetLength(PolyArr, L + MaxStepBack);
+  PolyArr[PntCount - 1].X := X;
+  PolyArr[PntCount - 1].Y := Y;
+end;
+
+class procedure TLuPolypointTrace.DelPoint(Index: Integer);
+var
+  I: Integer;
+begin
+  if PntCount > 1 then
+    for I := Index to PntCount - 2 do
+      PolyArr[I] := PolyArr[I + 1];
+  Dec(PntCount);
+end;
+
+class function  TLuPolypointTrace.GetPointCount: Integer;
+begin
+  Result := PntCount;
+end;
+
+class procedure TLuPolypointTrace.PrimaryTrace(const Tex: TLuTexture; const W, H: Integer);
+var
+  I: Integer;
+  Xn, Yn, Xnn, Ynn: Integer;
+  NextPointFound: Boolean;
+  Back: Integer;
+  StepBack: Integer;
+begin
+  FindStartingPoint(Tex, Xn, Yn, W, H);
+  NextPointFound := Xn <> 1000000;
+  StepBack := 0;
+  while NextPointFound do
+  begin
+    NextPointFound := False;
+    if not((PntCount > 3) and IsNeighbour(Xn, Yn, PolyArr[0].X, PolyArr[0].Y))
+    then
+    begin
+      if PntCount > 7 then
+        Back := 7
+      else
+        Back := PntCount;
+      if Back = 0 then // no points in list - take any near point
+        NextPointFound := FindNearestButNotNeighbourOfOther(Tex, Xn, Yn, -100,
+          -100, Xnn, Ynn, W, H)
+      else
+        for I := 1 to Back do
+        begin
+          NextPointFound := FindNearestButNotNeighbourOfOther(Tex, Xn, Yn,
+            PolyArr[PntCount - I].X, PolyArr[PntCount - I].Y, Xnn, Ynn, W, H);
+          NextPointFound := NextPointFound and (not IsInList(Xnn, Ynn));
+          if NextPointFound then
+            Break;
+        end;
+      AddPoint(Xn, Yn);
+      if NextPointFound then
+      begin
+        Xn := Xnn;
+        Yn := Ynn;
+        StepBack := 0;
+      end
+      else if StepBack < MaxStepBack then
+      begin
+        Xn := PolyArr[PntCount - StepBack * 2 - 2].X;
+        Yn := PolyArr[PntCount - StepBack * 2 - 2].Y;
+        Inc(StepBack);
+        NextPointFound := true;
+      end;
+    end;
+  end;
+  if PntCount > 0 then
+    AddPoint(PolyArr[0].X, PolyArr[0].Y);
+end;
+
+class procedure TLuPolypointTrace.SimplifyPoly;
+var
+  I: Integer;
+  Finished: Boolean;
+  Thinness: Extended;
+begin
+  Finished := False;
+  while not Finished do
+  begin
+    I := 0;
+    Finished := true;
+    while I <= PntCount - 3 do
+    begin
+      Thinness := TriangleThinness(PolyArr[I].X, PolyArr[I].Y, PolyArr[I + 1].X,
+        PolyArr[I + 1].Y, PolyArr[I + 2].X, PolyArr[I + 2].Y);
+      if Thinness < Mju then
+      begin
+        DelPoint(I + 1); // so delete middle point
+        Finished := False;
+      end;
+      Inc(I);
+    end;
+  end;
+end;
+
+class procedure TLuPolypointTrace.ApplyPolyPoint(aPolyPoint: TLuPolyPoint; aNum: Integer; aOrigin: PLuVector);
+var
+  I: Integer;
+begin
+  for I := 0 to PntCount - 1 do
+  begin
+    aPolyPoint.AddPoint(aNum, PolyArr[I].X, PolyArr[i].Y, aOrigin);
+  end;
+end;
+
+
+procedure TLuPolyPoint.Clear;
+var
+  I: Integer;
+begin
+  for I := 0 to Count-1 do
+  begin
+    if Assigned(FPolygon[I]) then
+    begin
+      Game.FreeNilObject(FPolygon[I]);
+    end;
+  end;
+  FPolygon := nil;
+  FCount := 0;
+end;
+
+constructor TLuPolyPoint.Create;
+begin
+  inherited;
+
+  FPolygon := nil;
+  FCount := 0;
+end;
+
+destructor TLuPolyPoint.Destroy;
+begin
+  Clear;
+
+  inherited;
+end;
+
+procedure TLuPolyPoint.Save(const aFilename: string);
+begin
+end;
+
+procedure TLuPolyPoint.Load(const aArchive: TLuArchive; const aFilename: string);
+begin
+end;
+
+procedure TLuPolyPoint.CopyFrom(const aPolyPoint: TLuPolyPoint);
+begin
+end;
+
+procedure TLuPolyPoint.AddPoint(const aNum: Integer; const aX, aY: Single; const aOrigin: PLuVector);
+var
+  X,Y: Single;
+begin
+  X := aX;
+  Y := aY;
+
+  if aOrigin  <> nil then
+  begin
+    X := X-Round(aOrigin.X);
+    Y := Y-Round(aOrigin.Y);
+  end;
+
+  FPolygon[aNum].AddLocalPoint(X, Y, True);
+end;
+
+function  TLuPolyPoint.TraceFromTexture(const aTexture: TLuTexture; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector): Integer;
+var
+  I: Integer;
+  W,H: Integer;
+begin
+  Inc(FCount);
+  SetLength(FPolygon, FCount);
+  I := FCount-1;
+  FPolygon[I] := TPolygon.Create;
+  aTexture.GetSize(@W, @H);
+  aTexture.Lock(nil);
+  TLuPolypointTrace.Init(aMju, aMaxStepBack, aAlphaThreshold);
+  TLuPolypointTrace.PrimaryTrace(aTexture, W, H);
+  TLuPolypointTrace.SimplifyPoly;
+  TLuPolypointTrace.ApplyPolyPoint(Self, I, aOrigin);
+  TLuPolypointTrace.Done;
+  aTexture.Unlock;
+
+  Result := I;
+end;
+
+procedure TLuPolyPoint.TraceFromSprite(const aSprite: TLuSprite; const aGroup: Integer; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector);
+var
+  I: Integer;
+  Rect: TLuRect;
+  Tex: TLuTexture;
+  W,H: Single;
+begin
+  Clear;
+  FCount := aSprite.ImageCount(aGroup);
+  SetLength(FPolygon, Count);
+  for I := 0 to Count-1 do
+  begin
+    FPolygon[I] := TPolygon.Create;
+    Tex  :=  aSprite.ImageTexture(I, aGroup);
+    Rect :=  aSprite.ImageRect(I, aGroup);
+    W := Rect.width;
+    H := Rect.height;
+    Tex.Lock(@Rect);
+    TLuPolypointTrace.Init(aMju, aMaxStepBack, aAlphaThreshold);
+    TLuPolypointTrace.PrimaryTrace(Tex, Round(W), Round(H));
+    TLuPolypointTrace.SimplifyPoly;
+    TLuPolypointTrace.ApplyPolyPoint(Self, I, aOrigin);
+    TLuPolypointTrace.Done;
+    Tex.Unlock;
+  end;
+end;
+
+function  TLuPolyPoint.Count: Integer;
+begin
+  Result := FCount;
+end;
+
+procedure TLuPolyPoint.Render(const aNum: Integer; aX, aY, aScale, aAngle: Single; const aColor: TLuColor; const aFlipMode: Integer; const aOrigin: PLuVector);
+begin
+  if aNum >= FCount then Exit;
+  FPolygon[aNum].Render(aX, aY, aScale, aAngle, 1, aColor, aFlipMode, aOrigin);
+end;
+
+function  TLuPolyPoint.Collide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
+  const aPolyPoint2: TLuPolyPoint; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer;
+  const aOrigin2: PLuVector; var aHitPos: TLuVector): Boolean;
+var
+  L1,L2,IX,IY: Integer;
+  Cnt1, Cnt2: Integer;
+  Pos: array[0..3] of PLuVector;
+  Poly1,Poly2: TPolygon;
+begin
+  Result := False;
+
+  if (aPolyPoint2 = nil) then Exit;
+
+  Poly1 := FPolygon[aNum1];
+  Poly2 := aPolyPoint2.Polygon(aNum2);
+
+  Poly1.Transform(aX1, aY1, aScale1, aAngle1, aFlipMode1, aOrigin1);
+  Poly2.Transform(aX2, aY2, aScale2, aAngle2, aFlipMode2, aOrigin2);
+
+  Cnt1 := Poly1.PointCount;
+  Cnt2 := Poly2.PointCount;
+
+  if Cnt1 < 2 then Exit;
+  if Cnt2 < 2 then Exit;
+
+  for L1 := 0 to Cnt1-2 do
+  begin
+    Pos[0] := Poly1.WorldPoint(L1);
+    Pos[1] := Poly1.WorldPoint(L1+1);
+
+    for L2 := 0 to Cnt2-2 do
+    begin
+
+      Pos[2] := Poly2.WorldPoint(L2);
+      Pos[3] := Poly2.WorldPoint(L2+1);
+      if Game.LineIntersection(Round(Pos[0].X), Round(Pos[0].Y),
+                          Round(Pos[1].X), Round(Pos[1].Y),
+                          Round(Pos[2].X), Round(Pos[2].Y),
+                          Round(Pos[3].X), Round(Pos[3].Y),
+                          IX, IY) = liTrue then
+      begin
+        aHitPos.X := IX;
+        aHitPos.Y := IY;
+        Result := True;
+        Exit;
+      end;
+    end;
+  end;
+
+end;
+
+function  TLuPolyPoint.CollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
+var
+  L1,IX,IY: Integer;
+  Cnt1: Integer;
+  Pos: array[0..3] of PLuVector;
+  Point2: TLuVector;
+  Poly1: TPolygon;
+begin
+  Result := False;
+
+  Poly1 := FPolygon[aNum];
+
+  Poly1.Transform(aX, aY, aScale, aAngle, aFlipMode, aOrigin);
+
+  Cnt1 := Poly1.PointCount;
+
+  if Cnt1 < 2 then Exit;
+
+  Point2.X := aPoint.X + 1;
+  Point2.Y := aPoint.Y + 1;
+  Pos[2] := @aPoint;
+  Pos[3] := @Point2;
+
+  for L1 := 0 to Cnt1-2 do
+  begin
+    Pos[0] := Poly1.WorldPoint(L1);
+    Pos[1] := Poly1.WorldPoint(L1+1);
+
+    if Game.LineIntersection(Round(Pos[0].X), Round(Pos[0].Y),
+                        Round(Pos[1].X), Round(Pos[1].Y),
+                        Round(Pos[2].X), Round(Pos[2].Y),
+                        Round(Pos[3].X), Round(Pos[3].Y),
+                        IX, IY) = liTrue then
+    begin
+      aPoint.X := IX;
+      aPoint.Y := IY;
+      Result := True;
+      Exit;
+    end;
+  end;
+
+end;
+
+function  TLuPolyPoint.Polygon(const aNum: Integer): TPolygon;
+begin
+  Result := FPolygon[aNum];
+end;
+
+function  TLuPolyPoint.Valid(const aNum: Integer): Boolean;
+begin
+  Result := False;
+  if aNum >= FCount then Exit;
+  Result := Boolean(FPolygon[aNum].PointCount >= 2);
+end;
+
+procedure TLuSprite.Clear;
+var
+  I: Integer;
+begin
+    if FTexture <> nil then
+    begin
+      for I := 0 to FGroupCount-1 do
+      begin
+        FGroup[I].Image := nil;
+
+        Game.FreeNilObject(FGroup[I].PolyPoint);
+      end;
+
+      for I := 0 to FPageCount-1 do
+      begin
+        if Assigned(FTexture[I]) then
+        begin
+          Game.FreeNilObject(FTexture[I]);
+        end;
+      end;
+
+      FTexture := nil;
+      FGroup := nil;
+      FPageCount := 0;
+      FGroupCount := 0;
+    end;
+end;
+
+constructor TLuSprite.Create;
+begin
+  inherited;
+
+  FTexture := nil;
+  FGroup := nil;
+  FPageCount := 0;
+  FGroupCount := 0;
+end;
+
+destructor TLuSprite.Destroy;
+begin
+  Clear;
+
+  inherited;
+end;
+
+function  TLuSprite.LoadPage(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor): Integer;
+begin
+  Result := FPageCount;
+  Inc(FPageCount);
+  SetLength(FTexture, FPageCount);
+  FTexture[Result] := TLuTexture.Create;
+  FTexture[Result].Load(aArchive, aFilename, aColorKey);
+end;
+
+function  TLuSprite.AddGroup: Integer;
+begin
+  Result := FGroupCount;
+  Inc(FGroupCount);
+  SetLength(FGroup, FGroupCount);
+  FGroup[Result].PolyPoint := TLuPolyPoint.Create;
+end;
+
+function  TLuSprite.AddImageFromRect(const aPage, aGroup: Integer; const aRect: TLuRect): Integer;
+begin
+  Result := FGroup[aGroup].Count;
+  Inc(FGroup[aGroup].Count);
+  SetLength(FGroup[aGroup].Image, FGroup[aGroup].Count);
+
+  FGroup[aGroup].Image[Result].Rect.X   := aRect.X;
+  FGroup[aGroup].Image[Result].Rect.Y   := aRect.Y;
+  FGroup[aGroup].Image[Result].Rect.Width := aRect.Width;
+  FGroup[aGroup].Image[Result].Rect.Height := aRect.Height;
+  FGroup[aGroup].Image[Result].Page   := aPage;
+end;
+
+function  TLuSprite.AddImageFromGrid(const aPage, aGroup, aGridX, aGridY, aGridWidth: Integer; aGridHeight: Integer): Integer;
+begin
+  Result := FGroup[aGroup].Count;
+  Inc(FGroup[aGroup].Count);
+  SetLength(FGroup[aGroup].Image, FGroup[aGroup].Count);
+
+  FGroup[aGroup].Image[Result].Rect.X      := aGridWidth  * aGridX;
+  FGroup[aGroup].Image[Result].Rect.Y      := aGridHeight * aGridY;
+  FGroup[aGroup].Image[Result].Rect.Width  := aGridWidth;
+  FGroup[aGroup].Image[Result].Rect.Height := aGridHeight;
+  FGroup[aGroup].Image[Result].Page        := aPage;
+end;
+
+function  TLuSprite.ImageCount(const aGroup: Integer): Integer;
+begin
+  Result := FGroup[aGroup].Count;
+end;
+
+function  TLuSprite.ImageWidth(const aNum, aGroup: Integer): Single;
+begin
+  Result := FGroup[aGroup].Image[aNum].Rect.Width;
+end;
+
+function  TLuSprite.ImageHeight(const aNum, aGroup: Integer): Single;
+begin
+  Result := FGroup[aGroup].Image[aNum].Rect.Height;
+end;
+
+function  TLuSprite.ImageTexture(const aNum, aGroup: Integer): TLuTexture;
+begin
+  Result := FTexture[FGroup[aGroup].Image[aNum].Page];
+end;
+
+procedure TLuSprite.RenderImage(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal; const aRenderPolyPoint: Boolean=false);
+var
+  PageNum: Integer;
+  RectP  : PLuRect;
+  oxy    : TLuVector;
+begin
+  RectP   := @FGroup[aGroup].Image[aNum].Rect;
+  PageNum := FGroup[aGroup].Image[aNum].Page;
+  FTexture[PageNum].Render(RectP, aX, aY, aScale, aAngle, aFlipMode, aOrigin, aColor, aBlendMode);
+
+  if aRenderPolyPoint then
+  begin
+    oxy.x := 0;
+    oxy.y := 0;
+    if aOrigin <> nil then
+    begin
+      oxy.x := FGroup[aGroup].Image[aNum].Rect.Width;
+      oxy.y := FGroup[aGroup].Image[aNum].Rect.Height;
+
+      oxy.X := Round(oxy.X * aOrigin.X);
+      oxy.Y := Round(oxy.Y * aOrigin.Y);
+    end;
+   FGroup[aGroup].PolyPoint.Render(aNum, aX, aY, aScale, aAngle, cLuYELLOW, aFlipMode, @oxy);
+  end;
+
+end;
+
+function  TLuSprite.ImageRect(const aNum, aGroup: Integer): TLuRect;
+begin
+  Result := FGroup[aGroup].Image[aNum].Rect;
+end;
+
+function  TLuSprite.GroupPolyPoint(const aGroup: Integer): Pointer;
+begin
+  Result := FGroup[aGroup].PolyPoint;
+end;
+
+procedure TLuSprite.GroupPolyPointTrace(const aGroup: Integer; const aMju: Single=6; const aMaxStepBack: Integer=12; const aAlphaThreshold: Integer=70; const aOrigin: PLuVector=nil);
+begin
+  FGroup[aGroup].PolyPoint.TraceFromSprite(Self, aGroup, aMju, aMaxStepBack, aAlphaThreshold, aOrigin);
+end;
+
+function  TLuSprite.GroupPolyPointCollide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
+  const aSprite2: TLuSprite; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer; const aOrigin2: PLuVector;
+  const aShrinkFactor: Single; var aHitPos: TLuVector): Boolean;
+var
+  PP1,PP2: TLuPolyPoint;
+  Radius1: Single;
+  Radius2: Single;
+  Origini1, Origini2: TLuVector;
+  Origini1P, Origini2P: PLuVector;
+begin
+  Result := False;
+
+  if (aSprite2 = nil) then Exit;
+
+  PP1 := FGroup[aGroup1].PolyPoint;
+  PP2 := aSprite2.FGroup[aGroup2].PolyPoint;
+
+  if not PP1.Valid(aNum1) then Exit;
+  if not PP2.Valid(aNum2) then Exit;
+
+  Radius1 := (FGroup[aGroup1].Image[aNum1].Rect.Height +
+              FGroup[aGroup1].Image[aNum1].Rect.Width) / 2;
+
+  Radius2 := (aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height +
+              aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width) / 2;
+
+  if not Game.RadiusOverlap(Radius1, aX1, aY1, Radius2, aX2, aY2, aShrinkFactor) then Exit;
+
+
+  Origini2.X := aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width;
+  Origini2.Y := aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height;
+
+  Origini1P  := nil;
+  if aOrigin1 <> nil then
+  begin
+    Origini1.X := Round(FGroup[aGroup1].Image[aNum1].Rect.Width  * aOrigin1.X);
+    Origini1.Y := Round(FGroup[aGroup1].Image[aNum1].Rect.Height * aOrigin1.Y);
+    Origini1P  := @Origini1;
+  end;
+
+  Origini2P  := nil;
+  if aOrigin2 <> nil then
+  begin
+    Origini2.X := Round(aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width  * aOrigin2.X);
+    Origini2.Y := Round(aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height * aOrigin2.Y);
+    Origini2P  := @Origini2;
+  end;
+
+
+  Result := PP1.Collide(aNum1, aGroup1, aX1, aY1, aScale1, aAngle1, aFlipMode1, Origini1P,
+                        PP2, aNum2, aGroup2, aX2, aY2, aScale2, aAngle2, aFlipMode2, Origini2P, aHitPos);
+end;
+
+function  TLuSprite.GroupPolyPointCollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector;
+  const aShrinkFactor: Single; var aPoint: TLuVector): Boolean;
+var
+  PP1: TLuPolyPoint;
+  Radius1: Single;
+  Radius2: Single;
+  Origini1: TLuVector;
+  Origini1P: PLuVector;
+
+begin
+  Result := False;
+
+  PP1 := FGroup[aGroup].PolyPoint;
+
+  if not PP1.Valid(aNum) then Exit;
+
+  Radius1 := (FGroup[aGroup].Image[aNum].Rect.Height +
+              FGroup[aGroup].Image[aNum].Rect.Width) / 2;
+
+  Radius2 := 2;
+
+  if not Game.RadiusOverlap(Radius1, aX, aY, Radius2, aPoint.X, aPoint.Y, aShrinkFactor) then
+    Exit;
+
+
+  Origini1P  := nil;
+  if aOrigin <> nil then
+  begin
+    Origini1.X := Round(FGroup[aGroup].Image[aNum].Rect.Width  * aOrigin.X);
+    Origini1.Y := Round(FGroup[aGroup].Image[aNum].Rect.Height * aOrigin.Y);
+    Origini1P  := @Origini1;
+  end;
+
+  Result := PP1.CollidePoint(aNum, aGroup, aX, aY, aScale, aAngle, aFlipMode, Origini1P, aPoint);
+end;
+
+{$ENDREGION}
+
+{$REGION 'Luna.Entity'}
+constructor TLuEntity.Create;
+begin
+  inherited
+end;
+
+destructor TLuEntity.Destroy;
+begin
+  inherited;
+end;
+
+procedure TLuEntity.Init(aSprite: TLuSprite; aGroup: Integer);
+begin
+  FSprite      := aSprite;
+  FGroup       := aGroup;
+  FFrame       := 0;
+  FFrameFPS    := 15;
+  FScale       := 1.0;
+  FAngle       := 0;
+  FAngleOffset := 0;
+  FColor       := WHITE;
+  FFlipMode    := cLuFLIP_NONE;
+  FLoopFrame   := True;
+  FShrinkFactor:= 1.0;
+  FOrigin.X := 0.5;
+  FOrigin.Y := 0.5;
+  FRenderPolyPoint := False;
+  FBlendMode := cLuBLENDMODE_BLEND;
+  SetPosAbs(0, 0);
+  SetFrameRange(0, aSprite.ImageCount(FGroup)-1);
+  SetFrame(FFrame);
+end;
+
+procedure TLuEntity.SetFrameRange(aFirst: Integer; aLast: Integer);
+begin
+  FFirstFrame := aFirst;
+  FLastFrame  := aLast;
+end;
+
+function  TLuEntity.NextFrame: Boolean;
+begin
+  Result := False;
+  if Game.FrameSpeed(FFrameTimer, FFrameFPS) then
+  begin
+    Inc(FFrame);
+    if FFrame > FLastFrame then
+    begin
+      if FLoopFrame then
+        FFrame := FFirstFrame
+      else
+        FFrame := FLastFrame;
+      Result := True;
+    end;
+  end;
+  SetFrame(FFrame);
+end;
+
+function  TLuEntity.PrevFrame: Boolean;
+begin
+  Result := False;
+  if Game.FrameSpeed(FFrameTimer, FFrameFPS) then
+  begin
+    Dec(FFrame);
+    if FFrame < FFirstFrame then
+    begin
+      if FLoopFrame then
+        FFrame := FLastFrame
+      else
+        FFrame := FFirstFrame;
+      Result := True;
+    end;
+  end;
+
+  SetFrame(FFrame);
+end;
+
+procedure TLuEntity.SetPosAbs(aX: Single; aY: Single);
+begin
+  FPos.X := aX;
+  FPos.Y := aY;
+  FDir.X := 0;
+  FDir.Y := 0;
+end;
+
+procedure TLuEntity.SetPosRel(aX: Single; aY: Single);
+begin
+  FPos.X := FPos.X + aX;
+  FPos.Y := FPos.Y + aY;
+  FDir.X := aX;
+  FDir.Y := aY;
+end;
+
+procedure TLuEntity.ScaleAbs(aScale: Single);
+begin
+  FScale := aScale;
+  SetFrame(FFrame);
+end;
+
+procedure TLuEntity.ScaleRel(aScale: Single);
+begin
+  FScale := FScale + aScale;
+  SetFrame(FFrame);
+end;
+
+procedure TLuEntity.SetAngleOffset(aAngle: Single);
+begin
+  aAngle := aAngle + FAngleOffset;
+  Game.ClipValuef(aAngle, 0, 360, True);
+  FAngleOffset := aAngle;
+end;
+
+procedure TLuEntity.RotateAbs(aAngle: Single);
+begin
+  Game.ClipValuef(aAngle, 0, 360, True);
+  FAngle := aAngle;
+end;
+
+procedure TLuEntity.RotateRel(aAngle: Single);
+begin
+  aAngle := aAngle + FAngle;
+  Game.ClipValuef(aAngle, 0, 360, True);
+  FAngle := aAngle;
+end;
+
+function  TLuEntity.RotateToAngle(aAngle: Single; aSpeed: Single): Boolean;
+var
+  Step: Single;
+  Len : Single;
+  S   : Single;
+begin
+  Result := False;
+  Step := Game.AngleDiff(FAngle, aAngle);
+  Len  := Sqrt(Step*Step);
+  if Len = 0 then
+    Exit;
+  S    := (Step / Len) * aSpeed;
+  FAngle := FAngle + S;
+  if Game.SameValuef(Step, 0, S) then
+  begin
+    RotateAbs(aAngle);
+    Result := True;
+  end;
+end;
+
+function  TLuEntity.RotateToPos(aX: Single; aY: Single; aSpeed: Single): Boolean;
+var
+  Angle: Single;
+  Step : Single;
+  Len  : Single;
+  S    : Single;
+  tmpPos  : TLuVector;
+begin
+  Result := False;
+  tmpPos.X  := aX;
+  tmpPos.Y  := aY;
+
+  Angle := -FPos.Angle(tmpPos);
+  Step := Game.AngleDiff(FAngle, Angle);
+  Len := Sqrt(Step*Step);
+  if Len = 0 then Exit;
+  S := (Step / Len) * aSpeed;
+
+  if not Game.SameValuef(Step, S, aSpeed) then
+    RotateRel(S)
+  else begin
+    RotateRel(Step);
+    Result := True;
+  end;
+end;
+
+function  TLuEntity.RotateToPosAt(aSrcX: Single; aSrcY: Single; aDestX: Single; aDestY: Single; aSpeed: Single): Boolean;
+var
+  Angle: Single;
+  Step : Single;
+  Len  : Single;
+  S    : Single;
+  SPos,DPos  : TLuVector;
+begin
+  Result := False;
+  SPos.X := aSrcX;
+  SPos.Y := aSrcY;
+  DPos.X  := aDestX;
+  DPos.Y  := aDestY;
+
+  Angle := SPos.Angle(DPos);
+  Step := Game.AngleDiff(FAngle, Angle);
+  Len := Sqrt(Step*Step);
+  if Len = 0 then Exit;
+  S := (Step / Len) * aSpeed;
+  if not Game.SameValuef(Step, S, aSpeed) then
+    RotateRel(S)
+  else begin
+    RotateRel(Step);
+    Result := True;
+  end;
+end;
+
+procedure TLuEntity.Thrust(aSpeed: Single);
+var
+  A, S: Single;
+begin
+  A := FAngle + 90.0;
+  Game.ClipValuef(A, 0, 360, True);
+  S := -aSpeed;
+  FDir.x := Game.AngleCos(Round(A)) * S;
+  FDir.y := Game.AngleSin(Round(A)) * S;
+  FPos.x := FPos.x + FDir.x;
+  FPos.y := FPos.y + FDir.y;
+end;
+
+procedure TLuEntity.ThrustAngle(aAngle: Single; aSpeed: Single);
+var
+  A, S: Single;
+begin
+  A := aAngle;
+
+  Game.ClipValuef(A, 0, 360, True);
+
+  S := -aSpeed;
+
+  FDir.x := Game.AngleCos(Round(A)) * S;
+  FDir.y := Game.AngleSin(Round(A)) * S;
+
+  FPos.x := FPos.x + FDir.x;
+  FPos.y := FPos.y + FDir.y;
+end;
+
+function  TLuEntity.ThrustToPos(aThrustSpeed: Single; aRotSpeed: Single; aDestX: Single; aDestY: Single; aSlowdownDist: Single; aStopDist: Single; aStopSpeed: Single; aStopSpeedEpsilon: Single; aDeltaTime: Single): Boolean;
+var
+  Dist : Single;
+  Step : Single;
+  Speed: Single;
+  DestPos: TLuVector;
+begin
+  Result := False;
+
+  if aSlowdownDist <= 0 then Exit;
+  if aStopDist < 0 then aStopDist := 0;
+
+  DestPos.X := aDestX;
+  DestPos.Y := aDestY;
+  Dist := FPos.Distance(DestPos);
+
+  Dist := Dist - aStopDist;
+
+  if  Dist > aSlowdownDist then
+    begin
+      Speed := aThrustSpeed;
+    end
+  else
+    begin
+      Step := (Dist/aSlowdownDist);
+      Speed := (aThrustSpeed * Step);
+      if Game.SameValuef(Speed, aStopSpeed, aStopSpeedEpsilon) then
+      begin
+        Speed := 0;
+        Result := True;
+      end;
+    end;
+
+  if RotateToPos(aDestX, aDestY, aRotSpeed*aDeltaTime) then
+  begin
+    Thrust(Speed*aDeltaTime);
+  end;
+
+end;
+
+function  TLuEntity.Visible(aVirtualX: Single; aVirtualY: Single): Boolean;
+var
+  HW,HH: Single;
+  vp: TLuRect;
+  X,Y: Single;
+begin
+  Result := False;
+
+  HW := FWidth / 2;
+  HH := FHeight / 2;
+
+  Game.GetWindowViewport(vp);
+
+  vp.Width := vp.Width-1;
+  vp.Height := vp.Height-1;
+
+  X := FPos.X - aVirtualX;
+  Y := FPos.Y - aVirtualY;
+
+  if X > (vp.Width + HW) then Exit;
+  if X < -HW    then Exit;
+  if Y > (vp.Height + HH) then Exit;
+  if Y < -HH    then Exit;
+
+  Result := True;
+end;
+
+function  TLuEntity.FullyVisible(aVirtualX: Single; aVirtualY: Single): Boolean;
+var
+  HW,HH: Single;
+  vp: TLuRect;
+  X,Y: Single;
+begin
+  Result := False;
+
+  HW := FWidth / 2;
+  HH := FHeight / 2;
+
+  Game.GetWindowViewport(vp);
+
+  vp.Width := vp.Width-1;
+  vp.Height := vp.Height-1;
+
+  X := FPos.X - aVirtualX;
+  Y := FPos.Y - aVirtualY;
+
+  if X > (vp.Width - HW) then Exit;
+  if X <  HW       then Exit;
+  if Y > (vp.Height - HH) then Exit;
+  if Y <  HH       then Exit;
+
+  Result := True;
+end;
+
+function  TLuEntity.Overlap(aX: Single; aY: Single; aRadius: Single; aShrinkFactor: Single): Boolean;
+var
+  Dist: Single;
+  R1  : Single;
+  R2  : Single;
+  V0,V1: TLuVector;
+begin
+  R1  := FRadius * aShrinkFactor;
+  R2  := aRadius * aShrinkFactor;
+
+  V0.X := FPos.X;
+  V0.Y := FPos.Y;
+
+  V1.x := aX;
+  V1.y := aY;
+
+  Dist := V0.Distance(V1);
+
+  if (Dist < R1) or (Dist < R2) then
+    Result := True
+  else
+   Result := False;
+end;
+
+function  TLuEntity.Overlap(aEntity: TLuEntity): Boolean;
+begin
+  with aEntity do
+  begin
+    Result := Overlap(FPos.X, FPos.Y, FRadius, FShrinkFactor);
+  end;
+end;
+
+procedure TLuEntity.Render(aVirtualX: Single; aVirtualY: Single);
+var
+  X,Y: Integer;
+begin
+  X := Round(FPos.X - aVirtualX);
+  Y := Round(FPos.Y - aVirtualY);
+  FSprite.RenderImage(FFrame, FGroup, X, Y, FScale, FAngle, FFlipMode, @FOrigin, FColor, FBlendMode, FRenderPolyPoint);
+end;
+
+procedure TLuEntity.RenderAt(aX: Single; aY: Single);
+begin
+  FSprite.RenderImage(FFrame, FGroup, Round(aX), Round(aY), FScale, FAngle, FFlipMode, @FOrigin, FColor,  FBlendMode, FRenderPolyPoint);
+end;
+
+procedure TLuEntity.TracePolyPoint(aMju: Single=6; aMaxStepBack: Integer=12; aAlphaThreshold: Integer=70; aOrigin: PLuVector=nil);
+begin
+  FSprite.GroupPolyPointTrace(FGroup, aMju, aMaxStepBack, aAlphaThreshold, aOrigin);
+end;
+
+function  TLuEntity.CollidePolyPoint(aEntity: TLuEntity; var aHitPos: TLuVector): Boolean;
+var
+  ShrinkFactor: Single;
+begin
+  ShrinkFactor := (FShrinkFactor + aEntity.ShrinkFactor) / 2.0;
+
+  Result := FSprite.GroupPolyPointCollide(
+    FFrame, FGroup, Round(FPos.X), Round(FPos.Y), FScale, FAngle, FFlipMode, @FOrigin,
+    aEntity.FSprite, aEntity.FFrame, aEntity.FGroup, Round(aEntity.FPos.X),
+    Round(aEntity.FPos.Y), aEntity.FScale, aEntity.FAngle, aEntity.FFlipMode,
+    @aEntity.FOrigin, ShrinkFactor, aHitPos);
+end;
+
+function  TLuEntity.CollidePolyPointPoint(var aPoint: TLuVector): Boolean;
+var
+  ShrinkFactor: Single;
+begin
+  ShrinkFactor := FShrinkFactor;
+
+  Result := FSprite.GroupPolyPointCollidePoint(
+    FFrame, FGroup, Round(FPos.X), Round(FPos.Y), FScale, FAngle, FFlipMode, @FOrigin,
+    ShrinkFactor, aPoint);
+end;
+
+function  TLuEntity.Sprite: TLuSprite;
+begin
+  Result := FSprite;
+end;
+
+function  TLuEntity.Group: Integer;
+begin
+  Result := FGroup;
+end;
+
+function  TLuEntity.Frame: Integer;
+begin
+  Result := FFrame;
+end;
+
+procedure TLuEntity.SetFrame(aFrame: Integer);
+var
+  W,H,R: Single;
+begin
+  if aFrame > FSprite.ImageCount(FGroup)-1  then
+    FFrame := FSprite.ImageCount(FGroup)-1
+  else
+    FFrame := aFrame;
+
+  W := FSprite.ImageWidth(FFrame, FGroup);
+  H := FSprite.ImageHeight(FFrame, FGroup);
+
+  R := (W + H) / 2;
+
+  FWidth  := W * FScale;
+  FHeight := H * FScale;
+  FRadius := R * FScale;
+end;
+
+function  TLuEntity.FrameFPS: Single;
+begin
+  Result := FFrameFPS;
+end;
+
+procedure TLuEntity.SetFrameFPS(aFrameFPS: Single);
+begin
+  FFrameFPS := aFrameFPS;
+end;
+
+function  TLuEntity.FirstFrame: Integer;
+begin
+  Result := FFirstFrame;
+end;
+
+function  TLuEntity.LastFrame: Integer;
+begin
+  Result := FLastFrame;
+end;
+
+function  TLuEntity.Pos: TLuVector;
+begin
+  Result := FPos;
+end;
+
+function  TLuEntity.Dir: TLuVector;
+begin
+  Result := FDir;
+end;
+
+function  TLuEntity.Scale: Single;
+begin
+  Result := FScale;
+end;
+
+function  TLuEntity.Angle: Single;
+begin
+  Result := FAngle;
+end;
+
+function  TLuEntity.AngleOffset: Single;
+begin
+  Result := FAngleOffset;
+end;
+
+function  TLuEntity.Color: TLuColor;
+begin
+ Result := FColor;
+end;
+
+procedure TLuEntity.SetColor(aColor: TLuColor);
+begin
+  FColor := aColor;
+end;
+
+function  TLuEntity.FlipMode: Integer;
+begin
+  Result := FFlipMode;
+end;
+
+procedure TLuEntity.SetFlipMode(aFlipMode: Integer);
+begin
+  FFlipMode := aFlipMode;
+end;
+
+function  TLuEntity.LoopFrame: Boolean;
+begin
+  Result := FLoopFrame;
+end;
+
+procedure TLuEntity.SetLoopFrame(aLoop: Boolean);
+begin
+  FLoopFrame := aLoop;
+end;
+
+function  TLuEntity.Width: Single;
+begin
+  Result := FWidth;
+end;
+
+function  TLuEntity.Height: Single;
+begin
+  Result := FHeight;
+end;
+
+function  TLuEntity.Radius: Single;
+begin
+  Result := FRadius;
+end;
+
+function  TLuEntity.ShrinkFactor: Single;
+begin
+  Result := FShrinkFactor;
+end;
+
+procedure TLuEntity.SetShrinkFactor(aShrinkFactor: Single);
+begin
+  FShrinkFactor := aShrinkFactor;
+end;
+
+procedure TLuEntity.SetRenderPolyPoint(aValue: Boolean);
+begin
+  FRenderPolyPoint := aValue;
+end;
+
+{$ENDREGION}
+
 {$REGION 'Luna.Game'}
 procedure LuRunGame(const aGame: TLuGameClass);
 var
@@ -24447,6 +26107,10 @@ begin
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, '0');
   SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, '1');
   SDL_SetHint(SDL_HINT_WINDOWS_DPI_SCALING, '1');
+  SDL_SetHint(SDL_HINT_RENDER_LINE_METHOD, '3');
+  SDL_SetHint(SDL_HINT_RENDER_DIRECT3D_THREADSAFE, '1');
+  SDL_SetHint(SDL_HINT_RENDER_LOGICAL_SIZE_MODE, '0');
+  SDL_SetHint(SDL_HINT_WINDOWS_USE_D3D9EX, '1');
 
   if SDL_Init(SDL_INIT_EVERYTHING) <> 0 then
   begin
@@ -24515,6 +26179,8 @@ begin
   FDefaultFont := TLuFont.Create;
   FDefaultFont.LoadDefault(Settings.DefaultFontSize, Settings.DefaultFontStyle);
 
+  FSprite := TLuSprite.Create;
+
   SetHudPos(FSettings.HudPosX, FSettings.HudPosY);
   SetHudLineSpace(FSettings.HudLineSpace);
   SetHudTextItemPadWidth(FSettings.HudTextItemPadWidth);
@@ -24527,12 +26193,14 @@ end;
 
 procedure TLuGame.UnapplySettings;
 begin
+  FreeNilObject(FSprite);
   FreeNilObject(FDefaultFont);
   FVideo.Shutdown;
   FInput.Shutdown;
   FTimer.Shutdown;
   FWindow.Shutdown;
   FSpeech.Shutdown;
+  FreeNilObject(FArchive);
 
   FMasterObjectList.Clean;
 
@@ -24690,6 +26358,8 @@ end;
 
 procedure TLuGame.OnUpdate(const aDeltaTime: Double);
 begin
+  GetMouseInfo(@FMousePos, nil);
+
   if KeyPressed(cLuSCANCODE_ESCAPE) then
     SetTerminate(True);
 end;

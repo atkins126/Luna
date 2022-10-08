@@ -66,118 +66,17 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ============================================================================= }
 
-unit uBasicTemplate;
+program IntermediateTemplate;
 
-interface
+{$APPTYPE CONSOLE}
+
+{$R *.res}
 
 uses
   System.SysUtils,
-  Luna;
+  uIntermediateTemplate in 'uIntermediateTemplate.pas',
+  Luna in '..\..\..\sources\Luna.pas';
 
-type
-
-  { TBasicTemplate }
-  TBasicTemplate = class(TLuGame)
-  protected
-  public
-    procedure OnSetSettings; override;
-    function  OnStartup: Boolean; override;
-    procedure OnShutdown; override;
-    procedure OnReady(const aReady: Boolean); override;
-    procedure OnClearWindow; override;
-    procedure OnUpdate(const aDeltaTime: Double); override;
-    procedure OnFixedUpdate(const aFixedUpdateSpeed: Single); override;
-    procedure OnRender; override;
-    procedure OnRenderHud; override;
-    procedure OnShowWindow; override;
-    procedure OnSpeechWord(const aWord, aText: string); override;
-    procedure OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean); override;
-    procedure OnVideoStatus(const aStatus: Cardinal; const aFilename: string); override;
-    procedure OnRun; override;
-  end;
-
-implementation
-
-{ TBasicTemplate }
-procedure TBasicTemplate.OnSetSettings;
 begin
-  inherited;
-
-  // Window
-  Settings.WindowTitle := 'Luna Game Toolkit - Basic Template';
-
-  // Archive
-  Settings.ArchivePassword := '6aace89f6ed348bd836360345eeb5ad9';
-  Settings.ArchiveFilename := 'Data.arc';
-end;
-
-function  TBasicTemplate.OnStartup: Boolean;
-begin
-  Result := False;
-
-  if not inherited then Exit;
-
-  Result := True;
-end;
-
-procedure TBasicTemplate.OnShutdown;
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnReady(const aReady: Boolean);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnClearWindow;
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnUpdate(const aDeltaTime: Double);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnFixedUpdate(const aFixedUpdateSpeed: Single);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnRender;
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnRenderHud;
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnShowWindow;
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnSpeechWord(const aWord, aText: string);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnVideoStatus(const aStatus: Cardinal; const aFilename: string);
-begin
-  inherited;
-end;
-
-procedure TBasicTemplate.OnRun;
-begin
-  inherited;
-end;
-
+  LuRunGame(TIntermediateTemplate);
 end.

@@ -30,8 +30,8 @@ if you wish to learn more about the Delphi language visit <a href="https://learn
 - **Input** (keyboard, mouse and joystick)
 - **Texture** (color key transparency, scaling, rotation, flipped, titled,  BMP, TGA, JPEG, PNG formats)
 - **Video** (play, pause, rewind, MPEG1 format)
-- **Sprite** (pages, groups, animation, poly-point collision) `coming soon!` 
-- **Entity** (defined from a sprite, position, scale, rotation, collision) `coming soon!`
+- **Sprite** (pages, groups, animation, poly-point collision)
+- **Entity** (defined from a sprite, position, scale, rotation, collision)
 - **Actor** (high level, actor, actor list management) `coming soon!`
 - **Audio** (samples, streams, WAV, OGG, FLAC formats)
 - **Font** (true type format, scale, normal, italics, bold, strike-through styles)
