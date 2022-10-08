@@ -1,6 +1,7 @@
 # CHANGELOG - Luna Game Toolkit
 
 ## Version 0.1.0
+- [x] Added `TLuConfigFile` and `TLuStarfield` classes, `BasicStarfield` example
 - [x] Added `EntityCollision` example
 - [x] Added `TLuPolygon`, `TLuSprite` and `TLuEntity` classes
 - [x] Changed the way certain errors are handled in `ApplySettings` method

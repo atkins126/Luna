@@ -21,6 +21,9 @@
         <Projects Include="..\examples\1.basic\video\BasicVideo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\examples\1.basic\Starfield\BasicStarfield.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj">
             <Dependencies/>
         </Projects>
@@ -86,6 +89,15 @@
     <Target Name="BasicVideo:Make">
         <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="BasicStarfield">
+        <MSBuild Projects="..\examples\1.basic\Starfield\BasicStarfield.dproj"/>
+    </Target>
+    <Target Name="BasicStarfield:Clean">
+        <MSBuild Projects="..\examples\1.basic\Starfield\BasicStarfield.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicStarfield:Make">
+        <MSBuild Projects="..\examples\1.basic\Starfield\BasicStarfield.dproj" Targets="Make"/>
+    </Target>
     <Target Name="InterEntityCollision">
         <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj"/>
     </Target>
@@ -96,13 +108,13 @@
         <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="LuArc;BasicMusic;BasicSpeech;BasicTexture;BasicTiledTexture;BasicVideo;InterEntityCollision"/>
+        <CallTarget Targets="LuArc;BasicMusic;BasicSpeech;BasicTexture;BasicTiledTexture;BasicVideo;BasicStarfield;InterEntityCollision"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="LuArc:Clean;BasicMusic:Clean;BasicSpeech:Clean;BasicTexture:Clean;BasicTiledTexture:Clean;BasicVideo:Clean;InterEntityCollision:Clean"/>
+        <CallTarget Targets="LuArc:Clean;BasicMusic:Clean;BasicSpeech:Clean;BasicTexture:Clean;BasicTiledTexture:Clean;BasicVideo:Clean;BasicStarfield:Clean;InterEntityCollision:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="LuArc:Make;BasicMusic:Make;BasicSpeech:Make;BasicTexture:Make;BasicTiledTexture:Make;BasicVideo:Make;InterEntityCollision:Make"/>
+        <CallTarget Targets="LuArc:Make;BasicMusic:Make;BasicSpeech:Make;BasicTexture:Make;BasicTiledTexture:Make;BasicVideo:Make;BasicStarfield:Make;InterEntityCollision:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

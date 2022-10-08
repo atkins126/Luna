@@ -66,7 +66,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ============================================================================= }
 
-unit uInterEntityCollision;
+unit uBasicStarfield;
 
 interface
 
@@ -76,13 +76,10 @@ uses
 
 type
 
-  { TInterEntityCollision }
-  TInterEntityCollision = class(TLuGame)
+  { TBasicStarfield }
+  TBasicStarfield = class(TLuGame)
   protected
-    FBoss: TLuEntity;
-    FFigure: TLuEntity;
-    FHitPos: TLuVector;
-    FCollide: Boolean;
+    FStarfield: TLuStarfield;
   public
     procedure OnSetSettings; override;
     function  OnStartup: Boolean; override;
@@ -93,86 +90,50 @@ type
 
 implementation
 
-{ TInterEntityCollision }
-procedure TInterEntityCollision.OnSetSettings;
+{ TBasicStarfield }
+procedure TBasicStarfield.OnSetSettings;
 begin
   inherited;
 
   // Window
-  Settings.WindowTitle := 'Luna Game Toolkit - Entity Collision [Intermediate]';
+  Settings.WindowTitle := 'Luna Game Toolkit - Basic Starfield';
+  Settings.WindowClearColor := cLuBlack;
 
   // Archive
   Settings.ArchivePassword := '6aace89f6ed348bd836360345eeb5ad9';
   Settings.ArchiveFilename := 'Data.arc';
 end;
 
-function  TInterEntityCollision.OnStartup: Boolean;
+function  TBasicStarfield.OnStartup: Boolean;
 begin
   Result := False;
 
   if not inherited then Exit;
 
-  Sprite.LoadPage(Archive, 'arc/images/boss.png', nil);
-  Sprite.AddGroup;
-  Sprite.AddImageFromGrid(0, 0, 0, 0, 128, 128);
-  Sprite.AddImageFromGrid(0, 0, 1, 0, 128, 128);
-  Sprite.AddImageFromGrid(0, 0, 0, 1, 128, 128);
-
-  Sprite.LoadPage(Archive, 'arc/images/figure.png', nil);
-  Sprite.AddGroup;
-  Sprite.AddImageFromGrid(1, 1, 0, 0, 128, 128);
-
-
-  FBoss := TLuEntity.Create;
-  FBoss.Init(Sprite, 0);
-  FBoss.SetFrameFPS(14);
-  FBoss.SetPosAbs(Settings.WindowWidth/2, (Settings.WindowHeight/2)-128);
-  FBoss.TracePolyPoint(6, 12, 70, nil);
-  FBoss.SetRenderPolyPoint(True);
-
-  FFigure := TLuEntity.Create;
-  FFigure.Init(Sprite, 1);
-  FFigure.SetFrameFPS(14);
-  FFigure.SetPosAbs(Settings.WindowWidth/2, Settings.WindowHeight/2);
-  FFigure.TracePolyPoint(6, 12, 70, nil);
-  FFigure.SetRenderPolyPoint(True);
+  FStarfield := TLuStarfield.Create;
 
   Result := True;
 end;
 
-procedure TInterEntityCollision.OnShutdown;
+procedure TBasicStarfield.OnShutdown;
 begin
-  FreeNilObject(FFigure);
-  FreeNilObject(FBoss);
+  FreeNilObject(FStarfield);
 
   inherited;
 end;
 
-procedure TInterEntityCollision.OnUpdate(const aDeltaTime: Double);
+procedure TBasicStarfield.OnUpdate(const aDeltaTime: Double);
 begin
   inherited;
 
-  FBoss.NextFrame;
-  FBoss.ThrustToPos(30*50, 14*50, MousePos.X, MousePos.Y, 128, 32, 5*50, cLuEPSILON, aDeltaTime);
-  if FBoss.CollidePolyPoint(FFigure, FHitPos) then
-    FCollide := True
-  else
-    FCollide := False;
-
-  FFigure.NextFrame;
-  FHitPos.Z :=  FHitPos.Z + (30.0 * aDeltaTime);
-  ClipValuef(FHitPos.Z, 0, 359, True);
-  FFigure.RotateAbs(FHitPos.Z);
+  FStarfield.Update(aDeltaTime);
 end;
 
-procedure TInterEntityCollision.OnRender;
+procedure TBasicStarfield.OnRender;
 begin
   inherited;
 
-  FFigure.Render(0, 0);
-  FBoss.Render(0, 0);
-  if FCollide then
-    DrawFilledRect(FHitPos.X, FHitPos.Y, 10, 10, cLuRed);
+  FStarfield.Render;
 end;
 
 end.

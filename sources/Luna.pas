@@ -99,6 +99,7 @@ uses
   System.Generics.Collections,
   System.Classes,
   System.IOUtils,
+  System.IniFiles,
   System.Math,
   System.JSON,
   System.Net.HttpClient,
@@ -14426,6 +14427,7 @@ const
 
   cLuLogExt = 'log';
   cLuArcExt = 'arc';
+  cLuIniExt = 'ini';
 
   cLuCR   = #13;
   cLuLF   = #10;
@@ -15656,6 +15658,72 @@ type
 
 {$ENDREGION}
 
+{$REGION 'Luna.ConfigFile'}
+type
+  TLuConfigFile = class(TLuBaseObject)
+  protected
+    FHandle: TIniFile;
+    FFilename: string;
+    FSection: TStringList;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    function  Open(const aFilename: string=''): Boolean;
+    procedure Close;
+    function  Opened: Boolean;
+    procedure Update;
+    function  RemoveSection(const aName: string): Boolean;
+    procedure SetValue(const aSection: string; const aKey: string; const aValue: string);  overload;
+    procedure SetValue(const aSection: string; const aKey: string; aValue: Integer); overload;
+    procedure SetValue(const aSection: string; const aKey: string; aValue: Boolean); overload;
+    procedure SetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal); overload;
+    function  GetValue(const aSection: string; const aKey: string; const aDefaultValue: string): string; overload;
+    function  GetValue(const aSection: string; const aKey: string; aDefaultValue: Integer): Integer; overload;
+    function  GetValue(const aSection: string; const aKey: string; aDefaultValue: Boolean): Boolean; overload;
+    procedure GetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal); overload;
+    function  RemoveKey(const aSection: string; const aKey: string): Boolean;
+    function  GetSectionValues(const aSection: string): Integer;
+    function  GetSectionValue(aIndex: Integer; aDefaultValue: string): string; overload;
+    function  GetSectionValue(aIndex: Integer; aDefaultValue: Integer): Integer; overload;
+    function  GetSectionValue(aIndex: Integer; aDefaultValue: Boolean): Boolean; overload;
+  end;
+
+{$ENDREGION}
+
+{$REGION 'Luna.Starfield'}
+type
+  TLuStarfield = class(TLuBaseObject)
+  protected
+  type
+    TStarfieldItem = record
+      X, Y, Z, Speed: Single;
+    end;
+  protected
+    FCenter: TLuVector;
+    FMin: TLuVector;
+    FMax: TLuVector;
+    FViewScaleRatio: Single;
+    FViewScale: Single;
+    FStarCount: Cardinal;
+    FStar: array of TStarfieldItem;
+    FSpeed: TLuVector;
+    FVirtualPos: TLuVector;
+    procedure TransformDrawPoint(const aX, aY, aZ: Single; aVPX, aVPY, aVPW, aVPH: Integer);
+    procedure Done;  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Init(const aStarCount: Cardinal; const aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ, aViewScale: Single);
+    procedure SetVirtualPos(const aX, aY: Single);
+    procedure GetVirtualPos(var aX: Single; var aY: Single);
+    procedure SetXSpeed(const aSpeed: Single);
+    procedure SetYSpeed(const aSpeed: Single);
+    procedure SetZSpeed(const aSpeed: Single);
+    procedure Update(const aDeltaTime: Single);
+    procedure Render;
+  end;
+
+{$ENDREGION}
+
 {$REGION 'Luna.Game'}
 type
   TLuGame = class
@@ -15708,6 +15776,7 @@ type
     FSprite: TLuSprite;
     FDefaultFont: TLuFont;
     FMousePos: TLuVector;
+    FConfigFile: TLuConfigFile;
   public
     property Marshaller: TMarshaller read FMarshaller;
     property MasterObjectList: TLuBaseObjectList read FMasterObjectList;
@@ -15715,6 +15784,7 @@ type
     property Sprite: TLuSprite read FSprite;
     property DefaultFont: TLuFont read FDefaultFont;
     property MousePos: TLuVector read FMousePos;
+    property ConfigFile: TLuConfigFile read FConfigFile;
 
     constructor Create; virtual;
     destructor Destroy; override;
@@ -25991,6 +26061,411 @@ end;
 
 {$ENDREGION}
 
+{$REGION 'Luna.ConfigFile'}
+constructor TLuConfigFile.Create;
+begin
+  inherited;
+
+  FHandle := nil;
+  FSection := TStringList.Create;
+end;
+
+destructor TLuConfigFile.Destroy;
+begin
+  Close;
+  FreeAndNil(FSection);
+
+  inherited;
+end;
+
+function  TLuConfigFile.Open(const aFilename: string): Boolean;
+var
+  LFilename: string;
+begin
+  Close;
+  LFilename := aFilename;
+  if LFilename.IsEmpty then
+  begin
+    LFilename := TPath.GetFileName(ParamStr(0));
+    LFilename := TPath.ChangeExtension(LFilename, cLuIniExt);
+    LFilename := TPath.Combine(Game.GetPrefsPath, LFilename);
+  end;
+  FHandle := TIniFile.Create(LFilename);
+  Result := Boolean(FHandle <> nil);
+  FFilename := LFilename;
+end;
+
+procedure TLuConfigFile.Close;
+begin
+  if not Opened then Exit;
+  FHandle.UpdateFile;
+  FreeAndNil(FHandle);
+end;
+
+function  TLuConfigFile.Opened: Boolean;
+begin
+  Result := Boolean(FHandle <> nil);
+end;
+
+procedure TLuConfigFile.Update;
+begin
+  if not Opened then Exit;
+  FHandle.UpdateFile;
+end;
+
+function  TLuConfigFile.RemoveSection(const aName: string): Boolean;
+var
+  LName: string;
+begin
+  Result := False;
+  if not Opened then Exit;
+  LName := aName;
+  if LName.IsEmpty then Exit;
+  FHandle.EraseSection(LName);
+  Result := True;
+end;
+
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; const aValue: string);
+begin
+  if not Opened then Exit;
+  FHandle.WriteString(aSection, aKey, aValue);
+end;
+
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; aValue: Integer);
+begin
+  if not Opened then Exit;
+  SetValue(aSection, aKey, aValue.ToString);
+end;
+
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; aValue: Boolean);
+begin
+  if not Opened then Exit;
+  SetValue(aSection, aKey, aValue.ToInteger);
+end;
+
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal);
+var
+  LValue: TMemoryStream;
+begin
+  if not Opened then Exit;
+  if aValue = nil then Exit;
+  LValue := TMemoryStream.Create;
+  try
+    LValue.Position := 0;
+    LValue.Write(aValue^, aValueSize);
+    LValue.Position := 0;
+    FHandle.WriteBinaryStream(aSection, aKey, LValue);
+  finally
+    FreeAndNil(LValue);
+  end;
+end;
+
+function  TLuConfigFile.GetValue(const aSection: string; const aKey: string; const aDefaultValue: string): string;
+begin
+  Result := '';
+  if not Opened then Exit;
+  Result := FHandle.ReadString(aSection, aKey, aDefaultValue);
+end;
+
+function  TLuConfigFile.GetValue(const aSection: string; const aKey: string; aDefaultValue: Integer): Integer;
+var
+  LResult: string;
+begin
+  Result := aDefaultValue;
+  if not Opened then Exit;
+  LResult := GetValue(aSection, aKey, aDefaultValue.ToString);
+  Integer.TryParse(LResult, Result);
+end;
+
+function  TLuConfigFile.GetValue(const aSection: string; const aKey: string; aDefaultValue: Boolean): Boolean;
+begin
+  Result := aDefaultValue;
+  if not Opened then Exit;
+  Result := GetValue(aSection, aKey, aDefaultValue.ToInteger).ToBoolean;
+end;
+
+procedure TLuConfigFile.GetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal);
+var
+  LValue: TMemoryStream;
+  LSize: Cardinal;
+begin
+  if not Opened then Exit;
+  if not Assigned(aValue) then Exit;
+  if aValueSize = 0 then Exit;
+  LValue := TMemoryStream.Create;
+  try
+    LValue.Position := 0;
+    FHandle.ReadBinaryStream(aSection, aKey, LValue);
+    LSize := aValueSize;
+    if aValueSize > LValue.Size then
+      LSize := LValue.Size;
+    LValue.Position := 0;
+    LValue.Write(aValue^, LSize);
+  finally
+    FreeAndNil(LValue);
+  end;
+end;
+
+function  TLuConfigFile.RemoveKey(const aSection: string; const aKey: string): Boolean;
+var
+  LSection: string;
+  LKey: string;
+begin
+  Result := False;
+  if not Opened then Exit;
+  LSection := aSection;
+  LKey := aKey;
+  if LSection.IsEmpty then Exit;
+  if LKey.IsEmpty then Exit;
+  FHandle.DeleteKey(LSection, LKey);
+  Result := True;
+end;
+
+function  TLuConfigFile.GetSectionValues(const aSection: string): Integer;
+var
+  LSection: string;
+begin
+  Result := 0;
+  if not Opened then Exit;
+  LSection := aSection;
+  if LSection.IsEmpty then Exit;
+  FSection.Clear;
+  FHandle.ReadSectionValues(LSection, FSection);
+  Result := FSection.Count;
+end;
+
+function  TLuConfigFile.GetSectionValue(aIndex: Integer; aDefaultValue: string): string;
+begin
+  Result := '';
+  if not Opened then Exit;
+  if (aIndex < 0) or (aIndex > FSection.Count - 1) then Exit;
+  Result := FSection.ValueFromIndex[aIndex];
+  if Result = '' then Result := aDefaultValue;
+end;
+
+function  TLuConfigFile.GetSectionValue(aIndex: Integer; aDefaultValue: Integer): Integer;
+begin
+  Result := aDefaultValue;
+  if not Opened then Exit;
+  Result := string(GetSectionValue(aIndex, aDefaultValue.ToString)).ToInteger;
+end;
+
+function  TLuConfigFile.GetSectionValue(aIndex: Integer; aDefaultValue: Boolean): Boolean;
+begin
+  Result := aDefaultValue;
+  if not Opened then Exit;
+  Result := string(GetSectionValue(aIndex, aDefaultValue.ToString)).ToBoolean
+end;
+
+{$ENDREGION}
+
+{$REGION 'Luna.Starfield'}
+procedure TLuStarfield.TransformDrawPoint(const aX, aY, aZ: Single; aVPX, aVPY, aVPW, aVPH: Integer);
+var
+  LX, LY: Single;
+  LSize: Single;
+  LOOZ: Single;
+  LCV: byte;
+  LColor: TLuColor;
+
+  function IsVisible(vx, vy, vw, vh: Single): Boolean;
+  begin
+    Result := False;
+    if ((vx - vw) < 0) then Exit;
+    if (vx > (aVPW - 1)) then Exit;
+    if ((vy - vh) < 0) then Exit;
+    if (vy > (aVPH - 1)) then Exit;
+    Result := True;
+  end;
+
+begin
+  FViewScaleRatio := aVPW / aVPH;
+  FCenter.X := (aVPW / 2) + aVPX;
+  FCenter.Y := (aVPH / 2) + aVPY;
+
+  LOOZ := ((1.0 / aZ) * FViewScale);
+  LX := (FCenter.X - aVPX) - (aX * LOOZ) * FViewScaleRatio;
+  LY := (FCenter.Y - aVPY) + (aY * LOOZ) * FViewScaleRatio;
+  LSize := (1.0 * LOOZ);
+  if LSize < 2 then LSize := 2;
+
+  LX := LX - FVirtualPos.X;
+  LY := LY - FVirtualPos.Y;
+  if not IsVisible(LX, LY, LSize, LSize) then Exit;
+
+  LCV := round(255.0 - (((1.0 / FMax.Z) / (1.0 / aZ)) * 255.0));
+  LColor.Make(LCV, LCV, LCV, LCV);
+
+  Game.DrawFilledRect(LX, LY, LSize, LSize, LColor);
+end;
+
+constructor TLuStarfield.Create;
+begin
+  inherited;
+
+  Init(250, -1000, -1000, 10, 1000, 1000, 1000, 120);
+end;
+
+destructor TLuStarfield.Destroy;
+begin
+  Done;
+
+  inherited;
+end;
+
+procedure TLuStarfield.Init(const aStarCount: Cardinal; const aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ, aViewScale: Single);
+var
+  LVPX, LVPY: Integer;
+  LVPW, LVPH: Integer;
+  LI: Integer;
+  LSize: TLuRect;
+begin
+  Done;
+
+  FStarCount := aStarCount;
+  SetLength(FStar, FStarCount);
+  Game.GetWindowViewport(LSize);
+  LVPX := Round(LSize.X);
+  LVPY := Round(LSize.Y);
+  LVPW := Round(LSize.Width);
+  LVPH := Round(LSize.Height);
+
+  FViewScale := aViewScale;
+  FViewScaleRatio := LVPW / LVPH;
+  FCenter.X := (LVPW / 2) + LVPX;
+  FCenter.Y := (LVPH / 2) + LVPY;
+  FCenter.Z := 0;
+
+  FMin.X := aMinX;
+  FMin.Y := aMinY;
+  FMin.Z := aMinZ;
+  FMax.X := aMaxX;
+  FMax.Y := aMaxY;
+  FMax.Z := aMaxZ;
+
+  for LI := 0 to FStarCount - 1 do
+  begin
+    FStar[LI].X := Game.RandomRangef(FMin.X, FMax.X);
+    FStar[LI].Y := Game.RandomRangef(FMin.Y, FMax.Y);
+    FStar[LI].Z := Game.RandomRangef(FMin.Z, FMax.Z);
+  end;
+
+  SetXSpeed(0.0);
+  SetYSpeed(0.0);
+  SetZSpeed(-60*3);
+  SetVirtualPos(0, 0);
+end;
+
+procedure TLuStarfield.Done;
+begin
+  FStar := nil;
+end;
+
+procedure TLuStarfield.SetVirtualPos(const aX, aY: Single);
+begin
+  FVirtualPos.X := aX;
+  FVirtualPos.Y := aY;
+  FVirtualPos.Z := 0;
+end;
+
+procedure TLuStarfield.GetVirtualPos(var aX: Single; var aY: Single);
+begin
+  aX := FVirtualPos.X;
+  aY := FVirtualPos.Y;
+end;
+
+procedure TLuStarfield.SetXSpeed(const aSpeed: Single);
+begin
+  FSpeed.X := aSpeed;
+end;
+
+procedure TLuStarfield.SetYSpeed(const aSpeed: Single);
+begin
+  FSpeed.Y := aSpeed;
+end;
+
+procedure TLuStarfield.SetZSpeed(const aSpeed: Single);
+begin
+  FSpeed.Z := aSpeed;
+end;
+
+procedure TLuStarfield.Update(const aDeltaTime: Single);
+var
+  LI: Integer;
+
+  procedure SetRandomPos(const aIndex: Integer);
+  begin
+    FStar[aIndex].X := Game.RandomRangef(FMin.X, FMax.X);
+    FStar[aIndex].Y := Game.RandomRangef(FMin.Y, FMax.Y);
+    FStar[aIndex].Z := Game.RandomRangef(FMin.Z, FMax.Z);
+  end;
+
+begin
+
+  for LI := 0 to FStarCount - 1 do
+  begin
+    FStar[LI].X := FStar[LI].X + (FSpeed.X * aDeltaTime);
+    FStar[LI].Y := FStar[LI].Y + (FSpeed.Y * aDeltaTime);
+    FStar[LI].Z := FStar[LI].Z + (FSpeed.Z * aDeltaTime);
+
+    if FStar[LI].X < FMin.X then
+    begin
+      SetRandomPos(LI);
+      FStar[LI].X := FMax.X;
+    end;
+
+    if FStar[LI].X > FMax.X then
+    begin
+      SetRandomPos(LI);
+      FStar[LI].X := FMin.X;
+    end;
+
+    if FStar[LI].Y < FMin.Y then
+    begin
+      SetRandomPos(LI);
+      FStar[LI].Y := FMax.Y;
+    end;
+
+    if FStar[LI].Y > FMax.Y then
+    begin
+      SetRandomPos(LI);
+      FStar[LI].Y := FMin.Y;
+    end;
+
+    if FStar[LI].Z < FMin.Z then
+    begin
+      SetRandomPos(LI);
+      FStar[LI].Z := FMax.Z;
+    end;
+
+    if FStar[LI].Z > FMax.Z then
+    begin
+      SetRandomPos(LI);
+      FStar[LI].Z := FMin.Z;
+    end;
+
+  end;
+end;
+
+procedure TLuStarfield.Render;
+var
+  LI: Integer;
+  LVPX, LVPY, LVPW, LVPH: Integer;
+  LSize: TLuRect;
+begin
+  Game.GetWindowViewport(LSize);
+  LVPX := Round(LSize.X);
+  LVPY := Round(LSize.Y);
+  LVPW := Round(LSize.Width);
+  LVPH := Round(LSize.Height);
+  for LI := 0 to FStarCount - 1 do
+  begin
+    TransformDrawPoint(FStar[LI].X, FStar[LI].Y, FStar[LI].Z, LVPX, LVPY, LVPW, LVPH);
+  end;
+end;
+
+{$ENDREGION}
+
 {$REGION 'Luna.Game'}
 procedure LuRunGame(const aGame: TLuGameClass);
 var
@@ -26166,6 +26641,7 @@ begin
   if not FTimer.Startup then Exit;
   if not FInput.Startup then Exit;
   if not FVideo.Startup then Exit;
+  FConfigFile := TLuConfigFile.Create;
 
   if TFile.Exists(Settings.ArchiveFilename) then
   begin
@@ -26193,6 +26669,7 @@ end;
 
 procedure TLuGame.UnapplySettings;
 begin
+  FreeNilObject(FConfigFile);
   FreeNilObject(FSprite);
   FreeNilObject(FDefaultFont);
   FVideo.Shutdown;
