@@ -15430,7 +15430,7 @@ type
 type
 
 
-  TPolygon = class(TLuBaseObject)
+  TLuPolygon = class(TLuBaseObject)
   protected
   type
     TSegment = record
@@ -15447,7 +15447,7 @@ type
     destructor Destroy; override;
     procedure Save(const aFilename: string);
     procedure Load(const aArchive: TLuArchive; const aFilename: string);
-    procedure CopyFrom(const aPolygon: TPolygon);
+    procedure CopyFrom(const aPolygon: TLuPolygon);
     procedure AddLocalPoint(const aX, aY: Single; const aVisible: Boolean);
     function  Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
     procedure Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
@@ -15502,7 +15502,7 @@ type
 
   TLuPolyPoint = class(TLuBaseObject)
   protected
-    FPolygon: array of TPolygon;
+    FPolygon: array of TLuPolygon;
     FCount  : Integer;
     procedure Clear;
   public
@@ -15520,7 +15520,7 @@ type
       const aPolyPoint2: TLuPolyPoint; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer;
       const aOrigin2: PLuVector; var aHitPos: TLuVector): Boolean;
     function  CollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
-    function  Polygon(const aNum: Integer): TPolygon;
+    function  Polygon(const aNum: Integer): TLuPolygon;
     function  Valid(const aNum: Integer): Boolean;
   end;
 
@@ -24550,26 +24550,26 @@ end;
 {$ENDREGION}
 
 {$REGION 'Luna.Polygon'}
-procedure TPolygon.Clear;
+procedure TLuPolygon.Clear;
 begin
   FSegment := nil;
   FWorldPoint := nil;
   FItemCount := 0;
 end;
 
-constructor TPolygon.Create;
+constructor TLuPolygon.Create;
 begin
   inherited;
   Clear;
 end;
 
-destructor TPolygon.Destroy;
+destructor TLuPolygon.Destroy;
 begin
   inherited;
   Clear;
 end;
 
-procedure TPolygon.Save(const aFilename: string);
+procedure TLuPolygon.Save(const aFilename: string);
 var
   Size: Integer;
   fs: TFileStream;
@@ -24589,7 +24589,7 @@ begin
   end;
 end;
 
-procedure TPolygon.Load(const aArchive: TLuArchive; const aFilename: string);
+procedure TLuPolygon.Load(const aArchive: TLuArchive; const aFilename: string);
 var
   LSize: Integer;
   LRWops: PSDL_RWops;
@@ -24615,7 +24615,7 @@ begin
   SDL_RWclose(LRWops);
 end;
 
-procedure TPolygon.CopyFrom(const aPolygon: TPolygon);
+procedure TLuPolygon.CopyFrom(const aPolygon: TLuPolygon);
 var
   I: Integer;
 begin
@@ -24630,7 +24630,7 @@ begin
 end;
 
 
-procedure TPolygon.AddLocalPoint(const aX, aY: Single; const aVisible: Boolean);
+procedure TLuPolygon.AddLocalPoint(const aX, aY: Single; const aVisible: Boolean);
 begin
   Inc(FItemCount);
   SetLength(FSegment, FItemCount);
@@ -24642,7 +24642,7 @@ begin
   FWorldPoint[FItemCount-1].Y := 0;
 end;
 
-function  TPolygon.Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
+function  TLuPolygon.Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
 var
   I: Integer;
   P: TLuVector;
@@ -24693,7 +24693,7 @@ begin
   Result := True;
 end;
 
-procedure TPolygon.Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
+procedure TLuPolygon.Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
 var
   I: Integer;
   X0,Y0,X1,Y1: Integer;
@@ -24713,27 +24713,27 @@ begin
   end;
 end;
 
-procedure TPolygon.SetSegmentVisible(const aIndex: Integer; const aVisible: Boolean);
+procedure TLuPolygon.SetSegmentVisible(const aIndex: Integer; const aVisible: Boolean);
 begin
   FSegment[aIndex].Visible := True;
 end;
 
-function  TPolygon.SegmentVisible(const aIndex: Integer): Boolean;
+function  TLuPolygon.SegmentVisible(const aIndex: Integer): Boolean;
 begin
   Result := FSegment[aIndex].Visible;
 end;
 
-function  TPolygon.PointCount: Integer;
+function  TLuPolygon.PointCount: Integer;
 begin
   Result := FItemCount;
 end;
 
-function  TPolygon.WorldPoint(const aIndex: Integer): PLuVector;
+function  TLuPolygon.WorldPoint(const aIndex: Integer): PLuVector;
 begin
   Result := @FWorldPoint[aIndex];
 end;
 
-function  TPolygon.LocalPoint(const aIndex: Integer): PLuVector;
+function  TLuPolygon.LocalPoint(const aIndex: Integer): PLuVector;
 begin
   Result := @FSegment[aIndex].Point;
 end;
@@ -25056,7 +25056,7 @@ begin
   Inc(FCount);
   SetLength(FPolygon, FCount);
   I := FCount-1;
-  FPolygon[I] := TPolygon.Create;
+  FPolygon[I] := TLuPolygon.Create;
   aTexture.GetSize(@W, @H);
   aTexture.Lock(nil);
   TLuPolypointTrace.Init(aMju, aMaxStepBack, aAlphaThreshold);
@@ -25081,7 +25081,7 @@ begin
   SetLength(FPolygon, Count);
   for I := 0 to Count-1 do
   begin
-    FPolygon[I] := TPolygon.Create;
+    FPolygon[I] := TLuPolygon.Create;
     Tex  :=  aSprite.ImageTexture(I, aGroup);
     Rect :=  aSprite.ImageRect(I, aGroup);
     W := Rect.width;
@@ -25114,7 +25114,7 @@ var
   L1,L2,IX,IY: Integer;
   Cnt1, Cnt2: Integer;
   Pos: array[0..3] of PLuVector;
-  Poly1,Poly2: TPolygon;
+  Poly1,Poly2: TLuPolygon;
 begin
   Result := False;
 
@@ -25164,7 +25164,7 @@ var
   Cnt1: Integer;
   Pos: array[0..3] of PLuVector;
   Point2: TLuVector;
-  Poly1: TPolygon;
+  Poly1: TLuPolygon;
 begin
   Result := False;
 
@@ -25201,7 +25201,7 @@ begin
 
 end;
 
-function  TLuPolyPoint.Polygon(const aNum: Integer): TPolygon;
+function  TLuPolyPoint.Polygon(const aNum: Integer): TLuPolygon;
 begin
   Result := FPolygon[aNum];
 end;
