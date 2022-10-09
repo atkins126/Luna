@@ -124,7 +124,7 @@ procedure TBasicSpeech.OnRenderHud;
 begin
   inherited;
 
-  HudText(DefaultFont, cLuGREEN, cLuHALIGN_LEFT, HudTextItem('S', 'Speak'), []);
+  HudText(DefaultFont, cLuGREEN, haLeft, HudTextItem('S', 'Speak'), []);
 end;
 
 procedure TBasicSpeech.OnSpeechWord(const aWord, aText: string);

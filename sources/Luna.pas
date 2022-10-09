@@ -14444,19 +14444,11 @@ const
   cLuLF   = #10;
   cLuCRLF = cLuCR+cLuLF;
 
-  cLuFLIP_NONE       = 0;
-  cLuFLIP_HORIZONTAL = 1;
-  cLuFLIP_VERTICAL   = 2;
-
-  cLuHALIGN_LEFT   = 0;
-  cLuHALIGN_CENTER = 1;
-  cLuHALIGN_RIGHT  = 2;
-
-  cLuVALIGN_TOP    = 3;
-  cLuVALIGN_MIDDLE = 4;
-  cLuVALIGN_BOTTOM = 5;
-
 type
+  TLuFlipMode = (fmNone=0, fmHorizontal=1, fmVertical=2);
+  TLuHAlign = (haLeft=0, haCenter=1, haRight=2);
+  TLuVAlign = (vaTop=3, vaMiddle=4, vaBottom=5);
+
   TLuBaseObjectList = class;
 
   TLuObjectAttributeSet = set of Byte;
@@ -14475,8 +14467,10 @@ type
     property Owner: TLuBaseObjectList read FOwner write FOwner;
     property Prev: TLuBaseObject read FPrev write FPrev;
     property Next: TLuBaseObject read FNext write FNext;
-    property Attribute[aIndex: Byte]: Boolean read GetAttribute write SetAttribute;
-    property Attributes: TLuObjectAttributeSet read GetAttributes  write SetAttributes;
+    property Attribute[aIndex: Byte]: Boolean read GetAttribute
+      write SetAttribute;
+    property Attributes: TLuObjectAttributeSet read GetAttributes
+      write SetAttributes;
     constructor Create; virtual;
     destructor Destroy; override;
     function AttributesAreSet(aAttrs: TLuObjectAttributeSet): Boolean;
@@ -14497,7 +14491,8 @@ type
     procedure Clear(aAttrs: TLuObjectAttributeSet);
   end;
 
-function GetConsoleWindow: hWnd; stdcall; external kernel32 name 'GetConsoleWindow';
+function GetConsoleWindow: hWnd; stdcall;
+  external kernel32 name 'GetConsoleWindow';
 
 {$ENDREGION}
 
@@ -14755,8 +14750,10 @@ type
     class function  Opened: Boolean; static;
     class procedure Reset; static;
     class function  GetFilename: string; static;
-    class function  Add(const aMsg: string; const aArgs: array of const): string; static;
-    class procedure Fatal(const aMsg: string; const aArgs: array of const); static;
+    class function  Add(const aMsg: string;
+      const aArgs: array of const): string; static;
+    class procedure Fatal(const aMsg: string;
+      const aArgs: array of const); static;
     class procedure SetConsoleOutput(const aConsoleOutput: Boolean); static;
     class function  GetConsoleOutput: Boolean; static;
     class procedure View; static;
@@ -14766,7 +14763,8 @@ type
 
 {$REGION 'Luna.Speech'}
 type
-  TLuSpeechVoiceAttribute = (vaDescription, vaName, vaVendor, vaAge, vaGender, vaLanguage, vaId);
+  TLuSpeechVoiceAttribute = (vaDescription, vaName, vaVendor, vaAge,
+    vaGender, vaLanguage, vaId);
 
   TLuSpeech = record
   private class var
@@ -14779,7 +14777,8 @@ type
     FVoice: Integer;
     FSubList: TDictionary<string, string>;
     FCallbacks: TObject;
-    class procedure OnWord(aSender: TObject; aStreamNumber: Integer; aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer); static;
+    class procedure OnWord(aSender: TObject; aStreamNumber: Integer;
+      aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer); static;
     class procedure DoSpeak(const aText: string; const aFlags: Integer); static;
     class procedure EnumVoices; static;
     class procedure FreeVoices; static;
@@ -14787,7 +14786,8 @@ type
     class function  Startup: Boolean; static;
     class procedure Shutdown; static;
     class function  GetVoiceCount: Integer; static;
-    class function  GetVoiceAttribute(const aIndex: Integer; const aAttribute: TLuSpeechVoiceAttribute): string; static;
+    class function  GetVoiceAttribute(const aIndex: Integer;
+      const aAttribute: TLuSpeechVoiceAttribute): string; static;
     class procedure ChangeVoice(const aIndex: Integer); static;
     class function  GetVoice: Integer; static;
     class procedure SetVolume(const aVolume: Single); static;
@@ -14800,7 +14800,8 @@ type
     class procedure Pause; static;
     class procedure Resume; static;
     class procedure Reset; static;
-    class procedure SubstituteWord(const aWord: string; const aSubstituteWord: string); static;
+    class procedure SubstituteWord(const aWord: string;
+      const aSubstituteWord: string); static;
   end;
 
 {$ENDREGION}
@@ -14893,15 +14894,18 @@ type
     class procedure Shutdown; static;
     class function  GetTicks: Double; static;
     class procedure Update; static;
-    class procedure Reset(const aSpeed: Single=0; const aFixedSpeed: Single=0); static;
+    class procedure Reset(const aSpeed: Single=0;
+      const aFixedSpeed: Single=0); static;
     class procedure SetUpdateSpeed(const aSpeed: Single); static;
     class function  GetUpdateSpeed: Single; static;
     class procedure SetFixedUpdateSpeed(const aSpeed: Single); static;
     class function  GetFixedUpdateSpeed: Single; static;
     class function  GetDeltaTime: Double; static;
     class function  GetFrameRate: Cardinal; static;
-    class function  FrameSpeed(var aTimer: Single; const aSpeed: Single): Boolean; static;
-    class function  FrameElapsed(var aTimer: Single; const aFrames: Single): Boolean; static;
+    class function  FrameSpeed(var aTimer: Single;
+      const aSpeed: Single): Boolean; static;
+    class function  FrameElapsed(var aTimer: Single;
+      const aFrames: Single): Boolean; static;
   end;
 
 {$ENDREGION}
@@ -15250,12 +15254,11 @@ type
 {$ENDREGION}
 
 {$REGION 'Luna.Texture'}
-const
-  cLuTEXTUREACCESS_STATIC    = 0; // Changes rarely, not lockable
-  cLuTEXTUREACCESS_STREAMING = 1; // Changes frequently, lockable
-  cLuTEXTUREACCESS_TARGET    = 2; // Texture can be used as a render target
-
 type
+  TLuBlendMode = (bmNone=0, bmBlend=1, bmAdd=2, bmMod=4, bmMul=8);
+
+  TLuTextureAccess = (taStatic=0, taStreaming=1, taTarget=2);
+
   TLuTexture = class(TLuBaseObject)
   protected
     FHandle: PSDL_Texture;
@@ -15269,11 +15272,16 @@ type
     property Handle: PSDL_Texture read FHandle;
     constructor Create; override;
     destructor Destroy; override;
-    procedure Alloc(const aWidth, aHeight, aAccess: Cardinal);
-    procedure Load(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor);
+    procedure Alloc(const aWidth, aHeight: Cardinal;
+      const aAccess: TLuTextureAccess);
+    procedure Load(const aArchive: TLuArchive; const aFilename: string;
+      const aColorKey: PLuColor);
     procedure Unload;
-    procedure Render(const aSrcRect: PLuRect; const aX, aY: Single; aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal);
-    procedure RenderTiled(const aDeltaX, aDeltaY: Single; const aColor: TLuColor; const aBlendMode: Cardinal);
+    procedure Render(const aSrcRect: PLuRect; const aX, aY: Single; aScale,
+      aAngle: Single; const aFlipMode: TLuFlipMode; const aOrigin: PLuVector;
+      const aColor: TLuColor; const aBlendMode: TLuBlendMode);
+    procedure RenderTiled(const aDeltaX, aDeltaY: Single;
+      const aColor: TLuColor; const aBlendMode: TLuBlendMode);
     procedure Lock(const aRect: PLuRect);
     procedure Unlock;
     procedure SetPixel(const aX, aY: Integer; const aColor: TLuColor);
@@ -15287,13 +15295,6 @@ type
 {$ENDREGION}
 
 {$REGION 'Luna.Window'}
-const
-  cLuBLENDMODE_NONE  = 0;
-  cLuBLENDMODE_BLEND = 1;
-  cLuBLENDMODE_ADD   = 2;
-  cLuBLENDMODE_MOD   = 4;
-  cLuBLENDMODE_MUL   = 8;
-
 type
   TLuWindow = record
   private class var
@@ -15307,14 +15308,16 @@ type
   public
     class function  Startup: Boolean; static;
     class procedure Shutdown; static;
-    class function  Open(const aTitle: string; const aX, aY, aWidth, aHeight: Integer): Boolean; static;
+    class function  Open(const aTitle: string; const aX, aY, aWidth,
+      aHeight: Integer): Boolean; static;
     class procedure Close; static;
     class function  IsOpen: Boolean; static;
     class procedure Clear(const aColor: TLuColor); static;
     class procedure Show; static;
     class function  GetWindowHandle: PSDL_Window; static;
     class function  GetRendererHandle: PSDL_Renderer; static;
-    class procedure GetInfo(aSize, aRenderSize, aScale: PLuVector; aDDpi, aHDpi, aVDpi: System.PSingle); static;
+    class procedure GetInfo(aSize, aRenderSize, aScale: PLuVector; aDDpi,
+      aHDpi, aVDpi: System.PSingle); static;
     class procedure SetTitle(const aTitle: string); static;
     class function  GetTitle: string; static;
     class procedure SetViewport(const aViewport: PLuRect); static;
@@ -15324,22 +15327,21 @@ type
     class procedure SetRenderClipRect(aRect: TLuRect); static;
     class function  GetRenderClipRect: TLuRect; static;
     class procedure DrawPoint(const aX, aY: Single; const aColor: TLuColor); static;
-    class procedure DrawLine(const aX1, aY1, aX2, aY2: Single; const aColor: TLuColor); static;
-    class procedure DrawRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor); static;
-    class procedure DrawFilledRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor); static;
+    class procedure DrawLine(const aX1, aY1, aX2, aY2: Single;
+      const aColor: TLuColor); static;
+    class procedure DrawRect(const aX, aY, aWidth, aHeight: Single;
+      const aColor: TLuColor); static;
+    class procedure DrawFilledRect(const aX, aY, aWidth, aHeight: Single;
+      const aColor: TLuColor); static;
   end;
 
 {$ENDREGION}
 
 {$REGION 'Luna.Font'}
-const
-  cLuFONTSTYLE_NORMAL        = $00;
-  cLuFONTSTYLE_BOLD          = $01;
-  cLuFONTSTYLE_ITALIC        = $02;
-  cLuFONTSTYLE_UNDERLINE     = $04;
-  cLuFONTSTYLE_STRIKETHROUGH = $08;
-
 type
+  TLuFontStyle = (fsNormal=$00, fsBold=$01, fsItalic=$02, fsUnderline=$04,
+    fsStrikethrough=$08);
+
   TLuFont = class(TLuBaseObject)
   protected
   const
@@ -15360,28 +15362,36 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    function  LoadDefault(aSize, aStyle: Cardinal): Boolean;
-    function  Load(aArchive: TLuArchive; const aFilename: string; aSize, aStyle: Cardinal): Boolean;
+    function  LoadDefault(const aSize: Cardinal;
+      const aStyle: TLuFontStyle): Boolean;
+    function  Load(const aArchive: TLuArchive; const aFilename: string;
+      const aSize: Cardinal; const aStyle: TLuFontStyle): Boolean;
     procedure Unload;
     procedure AddGlyph(const aChar: Cardinal);
     procedure AddTextChar(const aChar: Char);
     procedure AddTextChars(const aChars: string);
     procedure AddTextCharRange(const aFrom, aTo: Cardinal);
-    procedure DrawText(const aX, aY: Single; const aColor: TLuColor; const aHAlign: Cardinal; const aMsg: string; const aArgs: array of const); overload;
-    procedure DrawText(const aX: Single; var aY: Single; const aLineSpace: Single; const aColor: TLuColor; const aHAlign: Cardinal; const aMsg: string; const aArgs: array of const); overload;
-    procedure TextSize(const aMsg: string; const aArgs: array of const; aWidth, aHeight: PInteger);
+    procedure DrawText(const aX, aY: Single; const aColor: TLuColor;
+      const aHAlign: TLuHAlign; const aMsg: string;
+      const aArgs: array of const); overload;
+    procedure DrawText(const aX: Single; var aY: Single;
+      const aLineSpace: Single; const aColor: TLuColor;
+      const aHAlign: TLuHAlign; const aMsg: string;
+      const aArgs: array of const); overload;
+    procedure TextSize(const aMsg: string; const aArgs: array of const;
+      aWidth, aHeight: PInteger);
   end;
 
 {$ENDREGION}
 
 {$REGION 'Luna.Audio'}
 const
-  LuAUDIO_CHANNEL_MAX       = 16;
-  LuAUDIO_CHANNEL_DYNAMIC   = -1;
-  LuAUDIO_CHANNEL_LOOP      = -1;
-  LuADUIO_CHANNEL_NOFADING  = 0;
-  LuADUIO_CHANNEL_FADINGOUT = 1;
-  LuADUIO_CHANNEL_FADINGIN  = 2;
+  cLuAudioChannelMax       = 16;
+  cLuAudioChannelDynamic   = -1;
+  cLuAudioChannelLoop      = -1;
+  cLuAudioChannelNoFading  = 0;
+  cLuAudioChannelFadingOut = 1;
+  cLuAudioChannelFadingIn  = 2;
 
 type
   TLuMusic = PMix_Music;
@@ -15393,11 +15403,9 @@ type
   const
     LuVideoSampleBuffSize  = 2304;
 
-    LuVIDEOSTATUS_STOPPED = 0;
-    LuVIDEOSTATUS_PLAYING = 1;
-    LuVIDEOSTATUS_PAUSED  = 2;
-
 type
+
+  TLuVideoStatus = (vsStopped=0, vsPlaying=1, vsPaused=2);
 
   PVideo = ^TVideo;
   TVideo = record
@@ -15413,21 +15421,23 @@ type
     FHeight: Cardinal;
     FVolume: Single;
     FFrameRate: Single;
-    Status: Cardinal;
+    FStatus: TLuVideoStatus;
     FStopFlag: Boolean;
     FLoop: Integer;
     FFilename: string;
-    class procedure DoVideoStatus(const aStatus: Cardinal; const aFilename: string); static;
+    class procedure DoVideoStatus(const aStatus: TLuVideoStatus;
+      const aFilename: string); static;
   public
     class function Startup: Boolean; static;
     class procedure Shutdown; static;
-    class function  Load(const aArchive: TLuArchive; const aFilename: string): Boolean; static;
+    class function  Load(const aArchive: TLuArchive;
+      const aFilename: string): Boolean; static;
     class procedure Unload; static;
     class procedure Play(const aVolume: Single; const aLoop: Integer); static;
     class procedure Pause(const aPause: Boolean); static;
     class procedure Stop; static;
     class procedure Rewind; static;
-    class function  GetStatus: Cardinal; static;
+    class function  GetStatus: TLuVideoStatus; static;
     class function  GetWidth: Cardinal; static;
     class function  GetHeight: Cardinal; static;
     class function  GetFrameRate: Single; static;
@@ -15462,8 +15472,10 @@ type
     procedure Load(const aArchive: TLuArchive; const aFilename: string);
     procedure CopyFrom(const aPolygon: TLuPolygon);
     procedure AddLocalPoint(const aX, aY: Single; const aVisible: Boolean);
-    function  Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
-    procedure Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
+    function  Transform(const aX, aY, aScale, aAngle: Single;
+      const aFlipMode: TLuFlipMode; const aOrigin: PLuVector): Boolean;
+    procedure Render(const aX, aY, aScale, aAngle, aWidth: Single;
+      aColor: TLuColor; aFlipMode: TLuFlipMode; aOrigin: PLuVector);
     procedure SetSegmentVisible(const aIndex: Integer; const aVisible: Boolean);
     function  SegmentVisible(const aIndex: Integer): Boolean;
     function  PointCount: Integer;
@@ -15528,11 +15540,11 @@ type
     function  TraceFromTexture(const aTexture: TLuTexture; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector): Integer;
     procedure TraceFromSprite(const aSprite: TLuSprite; const aGroup: Integer; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector);
     function  Count: Integer;
-    procedure Render(const aNum: Integer; aX, aY, aScale, aAngle: Single; const aColor: TLuColor; const aFlipMode: Integer; const aOrigin: PLuVector);
-    function  Collide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
-      const aPolyPoint2: TLuPolyPoint; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer;
+    procedure Render(const aNum: Integer; aX, aY, aScale, aAngle: Single; const aColor: TLuColor; const aFlipMode: TLuFlipMode; const aOrigin: PLuVector);
+    function  Collide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: TLuFlipMode; const aOrigin1: PLuVector;
+      const aPolyPoint2: TLuPolyPoint; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: TLuFlipMode;
       const aOrigin2: PLuVector; var aHitPos: TLuVector): Boolean;
-    function  CollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
+    function  CollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: TLuFlipMode; const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
     function  Polygon(const aNum: Integer): TLuPolygon;
     function  Valid(const aNum: Integer): Boolean;
   end;
@@ -15561,23 +15573,36 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    function  LoadPage(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor): Integer;
+    function  LoadPage(const aArchive: TLuArchive; const aFilename: string;
+      const aColorKey: PLuColor): Integer;
     function  AddGroup: Integer;
-    function  AddImageFromRect(const aPage, aGroup: Integer; const aRect: TLuRect): Integer;
-    function  AddImageFromGrid(const aPage, aGroup, aGridX, aGridY, aGridWidth: Integer; aGridHeight: Integer): Integer;
+    function  AddImageFromRect(const aPage, aGroup: Integer;
+      const aRect: TLuRect): Integer;
+    function  AddImageFromGrid(const aPage, aGroup, aGridX, aGridY,
+      aGridWidth: Integer; aGridHeight: Integer): Integer;
     function  ImageCount(const aGroup: Integer): Integer;
     function  ImageWidth(const aNum, aGroup: Integer): Single;
     function  ImageHeight(const aNum, aGroup: Integer): Single;
     function  ImageTexture(const aNum, aGroup: Integer): TLuTexture;
-    procedure RenderImage(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal; const aRenderPolyPoint: Boolean=false);
+    procedure RenderImage(const aNum, aGroup: Integer; const aX, aY, aScale,
+      aAngle: Single; const aFlipMode: TLuFlipMode; const aOrigin: PLuVector;
+      const aColor: TLuColor; const aBlendMode: TLuBlendMode;
+      const aRenderPolyPoint: Boolean=false);
     function  ImageRect(const aNum, aGroup: Integer): TLuRect;
     function  GroupPolyPoint(const aGroup: Integer): Pointer;
-    procedure GroupPolyPointTrace(const aGroup: Integer; const aMju: Single=6; const aMaxStepBack: Integer=12; const aAlphaThreshold: Integer=70; const aOrigin: PLuVector=nil);
-    function  GroupPolyPointCollide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
-      const aSprite2: TLuSprite; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer; const aOrigin2: PLuVector;
+    procedure GroupPolyPointTrace(const aGroup: Integer; const aMju: Single=6;
+      const aMaxStepBack: Integer=12; const aAlphaThreshold: Integer=70;
+      const aOrigin: PLuVector=nil);
+    function  GroupPolyPointCollide(const aNum1, aGroup1: Integer; const aX1,
+      aY1, aScale1, aAngle1: Single; const aFlipMode1: TLuFlipMode;
+      const aOrigin1: PLuVector; const aSprite2: TLuSprite; const aNum2,
+      aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single;
+      const aFlipMode2: TLuFlipMode; const aOrigin2: PLuVector;
       const aShrinkFactor: Single; var aHitPos: TLuVector): Boolean;
-    function  GroupPolyPointCollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector;
-      const aShrinkFactor: Single; var aPoint: TLuVector): Boolean;
+    function  GroupPolyPointCollidePoint(const aNum, aGroup: Integer; const aX,
+      aY, aScale, aAngle: Single; const aFlipMode: TLuFlipMode;
+      const aOrigin: PLuVector; const aShrinkFactor: Single;
+      var aPoint: TLuVector): Boolean;
   end;
 
 {$ENDREGION}
@@ -15598,7 +15623,7 @@ type
     FAngle       : Single;
     FAngleOffset : Single;
     FColor       : TLuColor;
-    FFlipMode    : Integer;
+    FFlipMode    : TLuFlipMode;
     FLoopFrame   : Boolean;
     FWidth       : Single;
     FHeight      : Single;
@@ -15608,62 +15633,68 @@ type
     FShrinkFactor: Single;
     FOrigin      : TLuVector;
     FRenderPolyPoint: Boolean;
-    FBlendMode: Cardinal;
+    FBlendMode: TLuBlendMode;
   public
-    property BlendMode: Cardinal read FBlendMode write FBlendMode;
+    property BlendMode: TLuBlendMode read FBlendMode write FBlendMode;
     constructor Create; override;
     destructor Destroy; override;
-    procedure Init(aSprite: TLuSprite; aGroup: Integer);
-    procedure SetFrameRange(aFirst: Integer; aLast: Integer);
+    procedure Init(const aSprite: TLuSprite; const aGroup: Integer);
+    procedure SetFrameRange(const aFirst, aLast: Integer);
     function  NextFrame: Boolean;
     function  PrevFrame: Boolean;
     function  Frame: Integer;
-    procedure SetFrame(aFrame: Integer);
+    procedure SetFrame(const aFrame: Integer);
     function  FrameFPS: Single;
-    procedure SetFrameFPS(aFrameFPS: Single);
+    procedure SetFrameFPS(const aFrameFPS: Single);
     function  FirstFrame: Integer;
     function  LastFrame: Integer;
-    procedure SetPosAbs(aX: Single; aY: Single);
-    procedure SetPosRel(aX: Single; aY: Single);
+    procedure SetPosAbs(const aX, aY: Single);
+    procedure SetPosRel(const aX, aY: Single);
     function  Pos: TLuVector;
     function  Dir: TLuVector;
-    procedure ScaleAbs(aScale: Single);
-    procedure ScaleRel(aScale: Single);
+    procedure ScaleAbs(const aScale: Single);
+    procedure ScaleRel(const aScale: Single);
     function  Angle: Single;
     function  AngleOffset: Single;
-    procedure SetAngleOffset(aAngle: Single);
-    procedure RotateAbs(aAngle: Single);
-    procedure RotateRel(aAngle: Single);
-    function  RotateToAngle(aAngle: Single; aSpeed: Single): Boolean;
-    function  RotateToPos(aX: Single; aY: Single; aSpeed: Single): Boolean;
-    function  RotateToPosAt(aSrcX: Single; aSrcY: Single; aDestX: Single; aDestY: Single; aSpeed: Single): Boolean;
-    procedure Thrust(aSpeed: Single);
-    procedure ThrustAngle(aAngle: Single; aSpeed: Single);
-    function  ThrustToPos(aThrustSpeed: Single; aRotSpeed: Single; aDestX: Single; aDestY: Single; aSlowdownDist: Single; aStopDist: Single; aStopSpeed: Single; aStopSpeedEpsilon: Single; aDeltaTime: Single): Boolean;
-    function  Visible(aVirtualX: Single; aVirtualY: Single): Boolean;
-    function  FullyVisible(aVirtualX: Single; aVirtualY: Single): Boolean;
-    function  Overlap(aX: Single; aY: Single; aRadius: Single; aShrinkFactor: Single): Boolean; overload;
-    function  Overlap(aEntity: TLuEntity): Boolean; overload;
-    procedure Render(aVirtualX: Single; aVirtualY: Single);
-    procedure RenderAt(aX: Single; aY: Single);
-    procedure TracePolyPoint(aMju: Single=6; aMaxStepBack: Integer=12; aAlphaThreshold: Integer=70; aOrigin: PLuVector=nil);
-    function  CollidePolyPoint(aEntity: TLuEntity; var aHitPos: TLuVector): Boolean;
+    procedure SetAngleOffset(const aAngle: Single);
+    procedure RotateAbs(const aAngle: Single);
+    procedure RotateRel(const aAngle: Single);
+    function  RotateToAngle(const aAngle, aSpeed: Single): Boolean;
+    function  RotateToPos(const aX, aY, aSpeed: Single): Boolean;
+    function  RotateToPosAt(const aSrcX, aSrcY, aDestX, aDestY,
+      aSpeed: Single): Boolean;
+    procedure Thrust(const aSpeed: Single);
+    procedure ThrustAngle(const aAngle, aSpeed: Single);
+    function  ThrustToPos(const aThrustSpeed, aRotSpeed, aDestX, aDestY,
+      aSlowdownDist, aStopDist, aStopSpeed, aStopSpeedEpsilon: Single;
+      const aDeltaTime: Double): Boolean;
+    function  Visible(const aVirtualX, aVirtualY: Single): Boolean;
+    function  FullyVisible(const aVirtualX, aVirtualY: Single): Boolean;
+    function  Overlap(const aX, aY, aRadius,
+      aShrinkFactor: Single): Boolean; overload;
+    function  Overlap(const aEntity: TLuEntity): Boolean; overload;
+    procedure Render(const aVirtualX, aVirtualY: Single);
+    procedure RenderAt(const aX, aY: Single);
+    procedure TracePolyPoint(const aMju: Single=6; const aMaxStepBack: Integer=12;
+      const aAlphaThreshold: Integer=70; const aOrigin: PLuVector=nil);
+    function  CollidePolyPoint(const aEntity: TLuEntity;
+      var aHitPos: TLuVector): Boolean;
     function  CollidePolyPointPoint(var aPoint: TLuVector): Boolean;
     function  Sprite: TLuSprite;
     function  Group: Integer;
     function  Scale: Single;
     function  Color: TLuColor;
-    procedure SetColor(aColor: TLuColor);
-    function  FlipMode: Integer;
-    procedure SetFlipMode(aFlipMode: Integer);
+    procedure SetColor(const aColor: TLuColor);
+    function  FlipMode: TLuFlipMode;
+    procedure SetFlipMode(const aFlipMode: TLuFlipMode);
     function  LoopFrame: Boolean;
-    procedure SetLoopFrame(aLoop: Boolean);
+    procedure SetLoopFrame(const aLoop: Boolean);
     function  Width: Single;
     function  Height: Single;
     function  Radius: Single;
     function  ShrinkFactor: Single;
-    procedure SetShrinkFactor(aShrinkFactor: Single);
-    procedure SetRenderPolyPoint(aValue: Boolean);
+    procedure SetShrinkFactor(const aShrinkFactor: Single);
+    procedure SetRenderPolyPoint(const aValue: Boolean);
   end;
 
 
@@ -15684,19 +15715,30 @@ type
     function  Opened: Boolean;
     procedure Update;
     function  RemoveSection(const aName: string): Boolean;
-    procedure SetValue(const aSection: string; const aKey: string; const aValue: string);  overload;
-    procedure SetValue(const aSection: string; const aKey: string; aValue: Integer); overload;
-    procedure SetValue(const aSection: string; const aKey: string; aValue: Boolean); overload;
-    procedure SetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal); overload;
-    function  GetValue(const aSection: string; const aKey: string; const aDefaultValue: string): string; overload;
-    function  GetValue(const aSection: string; const aKey: string; aDefaultValue: Integer): Integer; overload;
-    function  GetValue(const aSection: string; const aKey: string; aDefaultValue: Boolean): Boolean; overload;
-    procedure GetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal); overload;
+    procedure SetValue(const aSection: string; const aKey: string;
+      const aValue: string);  overload;
+    procedure SetValue(const aSection: string; const aKey: string;
+      aValue: Integer); overload;
+    procedure SetValue(const aSection: string; const aKey: string;
+      aValue: Boolean); overload;
+    procedure SetValue(const aSection: string; const aKey: string;
+      aValue: Pointer; aValueSize: Cardinal); overload;
+    function  GetValue(const aSection: string; const aKey: string;
+      const aDefaultValue: string): string; overload;
+    function  GetValue(const aSection: string; const aKey: string;
+      aDefaultValue: Integer): Integer; overload;
+    function  GetValue(const aSection: string; const aKey: string;
+      aDefaultValue: Boolean): Boolean; overload;
+    procedure GetValue(const aSection: string; const aKey: string;
+      aValue: Pointer; aValueSize: Cardinal); overload;
     function  RemoveKey(const aSection: string; const aKey: string): Boolean;
     function  GetSectionValues(const aSection: string): Integer;
-    function  GetSectionValue(aIndex: Integer; aDefaultValue: string): string; overload;
-    function  GetSectionValue(aIndex: Integer; aDefaultValue: Integer): Integer; overload;
-    function  GetSectionValue(aIndex: Integer; aDefaultValue: Boolean): Boolean; overload;
+    function  GetSectionValue(aIndex: Integer;
+      aDefaultValue: string): string; overload;
+    function  GetSectionValue(const aIndex: Integer;
+      aDefaultValue: Integer): Integer; overload;
+    function  GetSectionValue(const aIndex: Integer;
+      aDefaultValue: Boolean): Boolean; overload;
   end;
 
 {$ENDREGION}
@@ -15719,11 +15761,13 @@ type
     FStar: array of TStarfieldItem;
     FSpeed: TLuVector;
     FVirtualPos: TLuVector;
-    procedure TransformDrawPoint(const aX, aY, aZ: Single; aVPX, aVPY, aVPW, aVPH: Integer);
+    procedure TransformDrawPoint(const aX, aY, aZ: Single; aVPX, aVPY, aVPW,
+      aVPH: Integer);
     procedure Done;  public
     constructor Create; override;
     destructor Destroy; override;
-    procedure Init(const aStarCount: Cardinal; const aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ, aViewScale: Single);
+    procedure Init(const aStarCount: Cardinal; const aMinX, aMinY, aMinZ,
+      aMaxX, aMaxY, aMaxZ, aViewScale: Single);
     procedure SetVirtualPos(const aX, aY: Single);
     procedure GetVirtualPos(var aX: Single; var aY: Single);
     procedure SetXSpeed(const aSpeed: Single);
@@ -15754,7 +15798,7 @@ type
       WindowHeight: Integer;
       WindowClearColor: TLuColor;
       DefaultFontSize: Cardinal;
-      DefaultFontStyle: Cardinal;
+      DefaultFontStyle: TLuFontStyle;
       HudTextItemPadWidth: Integer;
       HudPosX: Integer;
       HudPosY: Integer;
@@ -15816,8 +15860,10 @@ type
     procedure OnRenderHud; virtual;
     procedure OnShowWindow; virtual;
     procedure OnSpeechWord(const aWord, aText: string); virtual;
-    procedure OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean); virtual;
-    procedure OnVideoStatus(const aStatus: Cardinal; const aFilename: string); virtual;
+    procedure OnArchiveBuildProgress(const aFilename: string;
+      const aProgress: Integer; const aNewFile: Boolean); virtual;
+    procedure OnVideoStatus(const aStatus: TLuVideoStatus;
+      const aFilename: string); virtual;
     procedure OnRun; virtual;
 
     function  ApplySettings: Boolean; virtual;
@@ -15825,19 +15871,25 @@ type
     procedure GameLoop;
 
     procedure ShellOpen(const aFilename: string);
-    function  GetVersionInfo(const aInstance: THandle; const aIdent: string): string; overload;
-    function  GetVersionInfo(const aFilename: string; const aIdent: string): string; overload;
+    function  GetVersionInfo(const aInstance: THandle;
+      const aIdent: string): string; overload;
+    function  GetVersionInfo(const aFilename: string;
+      const aIdent: string): string; overload;
     function  GetSemVerStr(const aInstance: THandle): string;
     procedure FreeNilObject(const [ref] aObject: TObject);
     function  UnitToScalarValue(const aValue, aMaxValue: Double): Double;
     function  HttpGet(const aURL: string; const aStatus: PString=nil): string;
-    function  GetArcFilename(const aFilename: string; const aPassword: string=''): string;
-    function  GetArchiveRWops(const aFilename: string; const aPassword: string): PSDL_RWops;
+    function  GetArcFilename(const aFilename: string;
+      const aPassword: string=''): string;
+    function  GetArchiveRWops(const aFilename: string;
+      const aPassword: string): PSDL_RWops;
     function  GetFileRWops(const aFilename: string): PSDL_RWops;
     function  GetMemRWops(const aMem: Pointer; const aSize: Integer): PSDL_RWops;
-    function  BuildArchive(const aPassword, aFilename, aDirectory: string): Boolean;
+    function  BuildArchive(const aPassword, aFilename,
+      aDirectory: string): Boolean;
     function  ResourceExists(aInstance: THandle; const aResName: string): Boolean;
-    class function  IsSingleInstance(aMutexName: string; aKeepMutex: Boolean=True): Boolean;
+    class function  IsSingleInstance(aMutexName: string;
+      aKeepMutex: Boolean=True): Boolean;
 
     class function  HasConsoleOutput: Boolean;
     function  HasConsoleOnStartup: Boolean;
@@ -15869,12 +15921,16 @@ type
     function  RandomBool: Boolean;
     function  GetRandomSeed: Integer;
     procedure SetRandomSeed(const aVaLue: Integer);
-    function  ClipVaLuef(var aVaLue: Single; const aMin, aMax: Single; const aWrap: Boolean): Single;
-    function  ClipVaLue(var aVaLue: Integer; const aMin, aMax: Integer; const aWrap: Boolean): Integer;
+    function  ClipVaLuef(var aVaLue: Single; const aMin, aMax: Single;
+      const aWrap: Boolean): Single;
+    function  ClipVaLue(var aVaLue: Integer; const aMin, aMax: Integer;
+      const aWrap: Boolean): Integer;
     function  SameSign(const aVaLue1, aVaLue2: Integer): Boolean;
     function  SameSignf(const aVaLue1, aVaLue2: Single): Boolean;
-    function  SameVaLue(const aA, aB: Double; const aEpsilon: Double = 0): Boolean;
-    function  SameVaLuef(const aA, aB: Single; const aEpsilon: Single = 0): Boolean;
+    function  SameVaLue(const aA, aB: Double;
+      const aEpsilon: Double = 0): Boolean;
+    function  SameVaLuef(const aA, aB: Single;
+      const aEpsilon: Single = 0): Boolean;
     function  AngleDiff(const aSrcAngle, aDestAngle: Single): Single;
     procedure AngleRotatePos(const aAngle: Single; var aX, aY: Single);
     procedure SmoothMove(var aVaLue: Single; const aAmount, aMax, aDrag: Single);
@@ -15892,21 +15948,30 @@ type
     function  FrameSpeed(var aTimer: Single; const aSpeed: Single): Boolean;
     function  FrameElapsed(var aTimer: Single; const aFrames: Single): Boolean;
 
-    function  PointInRectangle(const aPoint: TLuVector; const aRect: TLuRect): Boolean;
-    function  PointInCircle(const aPoint, aCenter: TLuVector; const aRadius: Single): Boolean;
+    function  PointInRectangle(const aPoint: TLuVector;
+      const aRect: TLuRect): Boolean;
+    function  PointInCircle(const aPoint, aCenter: TLuVector;
+      const aRadius: Single): Boolean;
     function  PointInTriangle(const aPoint, aP1, aP2, aP3: TLuVector): Boolean;
-    function  CirclesOverlap(const aCenter1: TLuVector; const aRadius1: Single; const aCenter2: TLuVector; const aRadius2: Single): Boolean;
-    function  CircleInRectangle(const aCenter: TLuVector; const aRadius: Single; const aRect: TLuRect): Boolean;
+    function  CirclesOverlap(const aCenter1: TLuVector; const aRadius1: Single;
+      const aCenter2: TLuVector; const aRadius2: Single): Boolean;
+    function  CircleInRectangle(const aCenter: TLuVector; const aRadius: Single;
+      const aRect: TLuRect): Boolean;
     function  RectanglesOverlap(const aRect1, aRect2: TLuRect): Boolean;
     function  RectangleIntersection(const aRect1, aRect2: TLuRect): TLuRect;
-    function  LineIntersection(const aX1, aY1, aX2, aY2, aX3, aY3, aX4, aY4: Integer; var aX, aY: Integer): TLuLineIntersection;
-    function  RadiusOverlap(const aRadius1, aX1, aY1, aRadius2, aX2, aY2, aShrinkFactor: Single): Boolean;
+    function  LineIntersection(const aX1, aY1, aX2, aY2, aX3, aY3, aX4,
+      aY4: Integer; var aX, aY: Integer): TLuLineIntersection;
+    function  RadiusOverlap(const aRadius1, aX1, aY1, aRadius2, aX2, aY2,
+      aShrinkFactor: Single): Boolean;
 
-    function  EaseVaLue(const aCurrentTime, aStartVaLue, aChangeInVaLue, aDuration: Double; const aEaseType: TLuEaseType): Double;
-    function  EasePosition(const aStartPos, aEndPos, aCurrentPos: Double; const aEaseType: TLuEaseType): Double;
+    function  EaseVaLue(const aCurrentTime, aStartVaLue, aChangeInVaLue,
+      aDuration: Double; const aEaseType: TLuEaseType): Double;
+    function  EasePosition(const aStartPos, aEndPos, aCurrentPos: Double;
+      const aEaseType: TLuEaseType): Double;
 
     function  GetSpeechVoiceCount: Integer;
-    function  GetSpeechVoiceAttribute(const aIndex: Integer; const aAttribute: TLuSpeechVoiceAttribute): string;
+    function  GetSpeechVoiceAttribute(const aIndex: Integer;
+      const aAttribute: TLuSpeechVoiceAttribute): string;
     procedure ChangeSpeechVoice(const aIndex: Integer);
     function  GetSpeechVoice: Integer;
     procedure SetSpeechVolume(const aVolume: Single);
@@ -15921,14 +15986,16 @@ type
     procedure ResetSpeech;
     procedure SubstituteSpeechWord(const aWord, aSubstituteWord: string);
 
-    function  OpenWindow(const aTitle: string; const aX, aY, aWidth, aHeight: Integer): Boolean;
+    function  OpenWindow(const aTitle: string; const aX, aY, aWidth,
+      aHeight: Integer): Boolean;
     procedure CloseWindow;
     function  IsWindowOpen: Boolean;
     procedure ClearWindow(const aColor: TLuColor);
     procedure ShowWindow;
     function  GetWindowHandle: PSDL_Window;
     function  GetWindowRendererHandle: PSDL_Renderer;
-    procedure GetWindowInfo(const aSize, aRenderSize, aScale: PLuVector; const aDDpi, aHDpi, aVDpi: System.PSingle);
+    procedure GetWindowInfo(const aSize, aRenderSize, aScale: PLuVector;
+      const aDDpi, aHDpi, aVDpi: System.PSingle);
     procedure SetWindowTitle(const aTitle: string);
     function  GetWindowTitle: string;
     procedure SetWindowViewport(const aViewport: PLuRect);
@@ -15940,8 +16007,10 @@ type
 
     procedure DrawPoint(const aX, aY: Single; const aColor: TLuColor);
     procedure DrawLine(const aX1, aY1, aX2, aY2: Single; const aColor: TLuColor);
-    procedure DrawRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor);
-    procedure DrawFilledRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor);
+    procedure DrawRect(const aX, aY, aWidth, aHeight: Single;
+      const aColor: TLuColor);
+    procedure DrawFilledRect(const aX, aY, aWidth, aHeight: Single;
+      const aColor: TLuColor);
 
     procedure ClearInput;
     function  KeyDown(const aKey: Cardinal): Boolean;
@@ -15957,10 +16026,13 @@ type
     function  ControllerReleased(const aButton: Cardinal): Boolean;
     function  ControllerPosition(const aAxis: Cardinal): Single;
 
-    function  LoadMusic(const aArchive: TLuArchive; const aFilename: string): TLuMusic;
-    function  LoadPlayMusic(const aArchive: TLuArchive; const aFilename: string; const aVolume: Single; const aLoop: Integer): TLuMusic;
+    function  LoadMusic(const aArchive: TLuArchive;
+      const aFilename: string): TLuMusic;
+    function  LoadPlayMusic(const aArchive: TLuArchive; const aFilename: string;
+      const aVolume: Single; const aLoop: Integer): TLuMusic;
     procedure UnloadMusic(var aMusic: TLuMusic);
-    function  PlayMusic(const aMusic: TLuMusic; const aVolume: Single; const aLoop: Integer): Boolean;
+    function  PlayMusic(const aMusic: TLuMusic; const aVolume: Single;
+      const aLoop: Integer): Boolean;
     function  GetMusicVolume(const aMusic: TLuMusic): Single;
     procedure SetMusicVolume(const aVolume: Single);
 
@@ -15968,8 +16040,11 @@ type
     procedure UnloadSound(var aSound: TLuSound);
     procedure AllocateSoundChannels(const aCount: Integer);
     procedure ReserveSoundChannels(const aCount: Integer);
-    function  PlaySound(const aSound: TLuSound; const aChannel: Integer; const aVolume: Single; const aLoops: Integer): Integer;
-    function  FadeInSound(const aSound: TLuSound; const aChannel: Integer; const aVolume: Single; const aLoops: Integer; const aMilliseconds: Integer): Integer;
+    function  PlaySound(const aSound: TLuSound; const aChannel: Integer;
+      const aVolume: Single; const aLoops: Integer): Integer;
+    function  FadeInSound(const aSound: TLuSound; const aChannel: Integer;
+      const aVolume: Single; const aLoops: Integer;
+      const aMilliseconds: Integer): Integer;
     procedure FadeOutSound(const aChannel: Integer; const aMilliseconds: Integer);
     function  FadingSound(const aChannel: Integer): Integer;
     procedure StopSound(const aChannel: Integer);
@@ -15980,17 +16055,20 @@ type
     procedure ResumeSound(const aChannel: Integer);
     function  IsSoundPaused(const aChannel: Integer): Boolean;
     procedure ExpireSound(const aChannel: Integer; const aMilliseconds: Integer);
-    function  SetSoundPosition(const aChannel: Integer; const aAngle: SmallInt; const aDistance: Byte): Boolean;
+    function  SetSoundPosition(const aChannel: Integer; const aAngle: SmallInt;
+      const aDistance: Byte): Boolean;
 
     function  GetVideoHandle: PVideo;
-    function  LoadVideo(const aArchive: TLuArchive; const aFilename: string): Boolean;
+    function  LoadVideo(const aArchive: TLuArchive;
+      const aFilename: string): Boolean;
     procedure UnloadVideo;
     procedure PlayVideo(const aVolume: Single; const aLoop: Integer);
-    function  LoadPlayVideo(const aArchive: TLuArchive; const aFilename: string; const aVolume: Single; const aLoop: Integer): Boolean;
+    function  LoadPlayVideo(const aArchive: TLuArchive; const aFilename: string;
+      const aVolume: Single; const aLoop: Integer): Boolean;
     procedure PauseVideo(const aPause: Boolean);
     procedure StopVideo;
     procedure RewindVideo;
-    function  GetVideoStatus: Cardinal;
+    function  GetVideoStatus: TLuVideoStatus;
     function  GetVideoWidth: Cardinal;
     function  GetVideoHeight: Cardinal;
     function  GetVideoFrameRate: Single;
@@ -16003,8 +16081,10 @@ type
     procedure SetHudPos(const aX, aY: Integer);
     procedure SetHudLineSpace(const aLineSpace: Integer);
     procedure SetHudTextItemPadWidth(const aWidth: Integer);
-    procedure HudText(const aFont: TLuFont; const aColor: TLuColor; const aHAlign: Cardinal; const aMsg: string; const aArgs: array of const);
-    function  HudTextItem(const aKey: string; const aValue: string; const aSeperator: string='-'): string;
+    procedure HudText(const aFont: TLuFont; const aColor: TLuColor;
+      const aHAlign: TLuHAlign; const aMsg: string; const aArgs: array of const);
+    function  HudTextItem(const aKey: string; const aValue: string;
+      const aSeperator: string='-'): string;
   end;
 
   TLuGameClass = class of TLuGame;
@@ -17840,7 +17920,6 @@ end;
 procedure LoadDLL;
 var
   LResStream: TResourceStream;
-  LPath: string;
 begin
   if Assigned(uDllHandle) then Exit;
   if not Boolean((FindResource(HInstance, PChar(cDllResName), RT_RCDATA) <> 0)) then AbortDLL;
@@ -22092,7 +22171,6 @@ begin
           Remove(LPrev, True);
         end;
       end;
-
     LPrev := LNext;
 
   until LPrev = nil;
@@ -22116,7 +22194,6 @@ begin
   Result.Blue := aVAlue.b;
   Result.Alpha := aValue.a;
 end;
-
 
 function TLuColor.Make(const aRed, aGreen, aBlue, aAlpha: Byte): TLuColor;
 begin
@@ -22493,7 +22570,8 @@ begin
   Result := FFilename;
 end;
 
-class function TLuLogger.Add(const aMsg: string; const aArgs: array of const): string;
+class function TLuLogger.Add(const aMsg: string;
+  const aArgs: array of const): string;
 var
   LLine: string;
 begin
@@ -22542,15 +22620,19 @@ end;
 type
   TLuSpeechCallbacks = class
   public
-    procedure OnWord(aSender: TObject; aStreamNumber: Integer; aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer);
+    procedure OnWord(aSender: TObject; aStreamNumber: Integer;
+      aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer);
   end;
 
-procedure TLuSpeechCallbacks.OnWord(aSender: TObject; aStreamNumber: Integer; aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer);
+procedure TLuSpeechCallbacks.OnWord(aSender: TObject; aStreamNumber: Integer;
+  aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer);
 begin
-  TLuSpeech.OnWord(aSender, aStreamNumber, aStreamPosition, aCharacterPosition, aLength)
+  TLuSpeech.OnWord(aSender, aStreamNumber, aStreamPosition, aCharacterPosition,
+  aLength)
 end;
 
-class procedure TLuSpeech.OnWord(aSender: TObject; aStreamNumber: Integer; aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer);
+class procedure TLuSpeech.OnWord(aSender: TObject; aStreamNumber: Integer;
+  aStreamPosition: OleVariant; aCharacterPosition, aLength: Integer);
 var
   LWord: string;
 begin
@@ -22622,7 +22704,8 @@ begin
   Result := FVoiceList.Count;
 end;
 
-class function  TLuSpeech.GetVoiceAttribute(const aIndex: Integer; const aAttribute: TLuSpeechVoiceAttribute): string;
+class function  TLuSpeech.GetVoiceAttribute(const aIndex: Integer;
+  const aAttribute: TLuSpeechVoiceAttribute): string;
 var
   LSOToken: ISpeechObjectToken;
 
@@ -22758,7 +22841,8 @@ begin
   Startup;
 end;
 
-class procedure TLuSpeech.SubstituteWord(const aWord: string; const aSubstituteWord: string);
+class procedure TLuSpeech.SubstituteWord(const aWord: string;
+  const aSubstituteWord: string);
 var
   LWord: string;
   LSubstituteWord: string;
@@ -23499,7 +23583,8 @@ begin
   FSQL.Clear;
 end;
 
-procedure TLuCloudDb.AddSQLText(const aText: string; const aArgs: array of const);
+procedure TLuCloudDb.AddSQLText(const aText: string;
+  const aArgs: array of const);
 begin
   FSQL.Add(Format(aText, aArgs));
 end;
@@ -23541,7 +23626,8 @@ begin
   Result := FDataset.Count;
 end;
 
-function  TLuCloudDb.GetField(const aIndex: Cardinal; const aName: string): string;
+function  TLuCloudDb.GetField(const aIndex: Cardinal;
+  const aName: string): string;
 begin
   Result := '';
   if not Assigned(FDataset) then Exit;
@@ -23625,7 +23711,8 @@ function TLuArchive.Open(const aPassword, aFilename: string): Boolean;
 begin
   Result := False;
   if FIsOpen then Exit;
-  Result := Boolean(PHYSFS_mount(PAnsiChar(AnsiString(aFilename)), '', SDL_True) <> 0);
+  Result := Boolean(PHYSFS_mount(PAnsiChar(AnsiString(aFilename)), '',
+    SDL_True) <> 0);
   if Result then
   begin
     FFilename := aFilename;
@@ -23652,7 +23739,8 @@ begin
   Result := FIsOpen;
 end;
 
-function TLuArchive.Build(const aPassword, aFilename, aDirectory: string): Boolean;
+function TLuArchive.Build(const aPassword, aFilename,
+  aDirectory: string): Boolean;
 var
   LFileList: TStringDynArray;
   LFilename: string;
@@ -23690,7 +23778,8 @@ begin
   SetLength(LBuffer, cBufferSize);
   FillChar(LZipFileInfo, SizeOf(LZipFileInfo), 0);
 
-  LFileList := TDirectory.GetFiles(aDirectory, '*', TSearchOption.soAllDirectories);
+  LFileList := TDirectory.GetFiles(aDirectory, '*',
+    TSearchOption.soAllDirectories);
 
   LZipFile := zipOpen(PAnsiChar(AnsiString(aFilename)), APPEND_STATUS_CREATE);
 
@@ -23841,7 +23930,8 @@ begin
   Result := FFrameRate;
 end;
 
-class function  TLuTimer.FrameSpeed(var aTimer: Single; const aSpeed: Single): Boolean;
+class function  TLuTimer.FrameSpeed(var aTimer: Single;
+  const aSpeed: Single): Boolean;
 begin
   Result := False;
   aTimer := aTimer + (aSpeed / FUpdateSpeed);
@@ -23852,7 +23942,8 @@ begin
   end;
 end;
 
-class function  TLuTimer.FrameElapsed(var aTimer: Single; const aFrames: Single): Boolean;
+class function  TLuTimer.FrameElapsed(var aTimer: Single;
+  const aFrames: Single): Boolean;
 begin
   Result := False;
   aTimer := aTimer + FDeltaTime;
@@ -24195,11 +24286,13 @@ begin
   inherited;
 end;
 
-procedure TLuTexture.Alloc(const aWidth, aHeight, aAccess: Cardinal);
+procedure TLuTexture.Alloc(const aWidth, aHeight: Cardinal;
+  const aAccess: TLuTextureAccess);
 var
   LHandle: PSDL_Texture;
 begin
-  LHandle := SDL_CreateTexture(Game.GetWindowRendererHandle, SDL_PIXELFORMAT_ARGB8888, aAccess, aWidth, aHeight);
+  LHandle := SDL_CreateTexture(Game.GetWindowRendererHandle,
+    SDL_PIXELFORMAT_ARGB8888, Ord(aAccess), aWidth, aHeight);
   if not Assigned(LHandle) then Exit;
   Unload;
   FHandle := LHandle;
@@ -24208,8 +24301,8 @@ begin
   SDL_QueryTexture(FHandle, nil, nil, @FWidth, @FHeight);
 end;
 
-
-procedure TLuTexture.Load(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor);
+procedure TLuTexture.Load(const aArchive: TLuArchive; const aFilename: string;
+  const aColorKey: PLuColor);
 var
   LRWops: PSDL_RWops;
   LHandle: PSDL_Texture;
@@ -24235,7 +24328,9 @@ begin
   destsurface := SDL_ConvertSurface(srcsurface, LPixelFormat, 0);
   SDL_FreeSurface(srcsurface);
 
-  LHandle := SDL_CreateTexture(Game.GetWindowRendererHandle,SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING, destsurface.w, destsurface.h);
+  LHandle := SDL_CreateTexture(Game.GetWindowRendererHandle,
+    SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_STREAMING, destsurface.w,
+    destsurface.h);
   SDL_LockSurface(destsurface);
   SDL_UpdateTexture(LHandle, nil, destsurface.pixels, destsurface.pitch);
   SDL_UnlockSurface(destsurface);
@@ -24266,7 +24361,9 @@ begin
   end;
 end;
 
-procedure TLuTexture.Render(const aSrcRect: PLuRect; const aX, aY: Single; aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal);
+procedure TLuTexture.Render(const aSrcRect: PLuRect; const aX, aY: Single;
+  aScale, aAngle: Single; const aFlipMode: TLuFlipMode; const aOrigin: PLuVector;
+  const aColor: TLuColor; const aBlendMode: TLuBlendMode);
 var
   srcrect,dstrect: SDL_Rect;
   X, Y, w, h: Single;
@@ -24312,12 +24409,14 @@ begin
   SDL_SetTextureColorMod(FHandle, aColor.Red, aColor.Green, aColor.BLue);
   SDL_SetTextureAlphaMod(FHandle, aColor.Alpha);
 
-  SDL_SetTextureBlendMode(FHandle, aBlendMode);
+  SDL_SetTextureBlendMode(FHandle, Ord(aBlendMode));
 
-  SDL_RenderCopyEx(Game.GetWindowRendererHandle, FHandle, @srcrect, @dstrect, aAngle, nil, aFlipMode);
+  SDL_RenderCopyEx(Game.GetWindowRendererHandle, FHandle, @srcrect, @dstrect,
+    aAngle, nil, Ord(aFlipMode));
 end;
 
-procedure TLuTexture.RenderTiled(const aDeltaX, aDeltaY: Single; const aColor: TLuColor; const aBlendMode: Cardinal);
+procedure TLuTexture.RenderTiled(const aDeltaX, aDeltaY: Single;
+  const aColor: TLuColor; const aBlendMode: TLuBlendMode);
 var
   w,h    : Integer;
   ox,oy  : Integer;
@@ -24357,7 +24456,7 @@ begin
     ix := tx;
     while ix<vr do
     begin
-      Render(nil, ix+fx, iy+fy, 1, 0, SDL_FLIP_NONE, nil, aColor, aBlendMode);
+      Render(nil, ix+fx, iy+fy, 1, 0, fmNone, nil, aColor, aBlendMode);
       ix := ix+w;
     end;
    iy := iy+h;
@@ -24414,7 +24513,8 @@ begin
 
   p := FPixels;
   Inc(p, (LY * FWidth) + LX);
-  p^ :=  SDL_MapRGBA(FPixelFormat, aColor.Red, aColor.Green, aColor.BLue, aColor.BLue);
+  p^ :=  SDL_MapRGBA(FPixelFormat, aColor.Red, aColor.Green, aColor.BLue,
+    aColor.BLue);
 end;
 
 function  TLuTexture.GetPixel(const aX, aY: Integer): TLuColor;
@@ -24438,7 +24538,8 @@ begin
   p := FPixels;
   Inc(p, (LY * FWidth) + LX);
 
-  SDL_GetRGBA(p^, FPixelFormat, @Result.Red, @Result.Green, @Result.BLue, @Result.Alpha);
+  SDL_GetRGBA(p^, FPixelFormat, @Result.Red, @Result.Green, @Result.BLue,
+    @Result.Alpha);
 end;
 
 procedure TLuTexture.GetSize(aWidth: PInteger; aHeight: PInteger);
@@ -24474,7 +24575,8 @@ begin
   if not Assigned(FHandle) then Exit;
   SDL_LockTextureToSurface(FHandle, nil, @LSurface);
   if Assigned(LSurface) then
-    Result := Boolean(IMG_SavePNG(LSurface, Game.Marshaller.AsUtf8(aFilename).ToPointer) = 0);
+    Result := Boolean(IMG_SavePNG(LSurface,
+      Game.Marshaller.AsUtf8(aFilename).ToPointer) = 0);
   SDL_UnlockTexture(FHandle);
 end;
 
@@ -24494,7 +24596,8 @@ begin
   Close;
 end;
 
-class function  TLuWindow.Open(const aTitle: string; const aX, aY, aWidth, aHeight: Integer): Boolean;
+class function  TLuWindow.Open(const aTitle: string; const aX, aY, aWidth,
+  aHeight: Integer): Boolean;
 var
   LFlags: integer;
   LX, LY: Integer;
@@ -24516,7 +24619,8 @@ begin
   else
     LY := aY;
 
-  FWindow := SDL_CreateWindow(Game.Marshaller.AsUtf8(aTitle).ToPointer, LX, LY, aWidth, aHeight, SDL_WINDOW_SHOWN or SDL_WINDOW_ALLOW_HIGHDPI);
+  FWindow := SDL_CreateWindow(Game.Marshaller.AsUtf8(aTitle).ToPointer, LX, LY,
+    aWidth, aHeight, SDL_WINDOW_SHOWN or SDL_WINDOW_ALLOW_HIGHDPI);
   if not Assigned(FWindow) then
   begin
     Game.Log(string(SDL_GetError), []);
@@ -24571,7 +24675,8 @@ end;
 class procedure TLuWindow.Clear(const aColor: TLuColor);
 begin
   if not IsOpen then Exit;
-  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue, aColor.Alpha);
+  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue,
+    aColor.Alpha);
   SDL_RenderClear(FRenderer);
 end;
 
@@ -24591,7 +24696,8 @@ begin
   Result := FRenderer;
 end;
 
-class procedure TLuWindow.GetInfo(aSize, aRenderSize, aScale: PLuVector; aDDpi, aHDpi, aVDpi: System.PSingle);
+class procedure TLuWindow.GetInfo(aSize, aRenderSize, aScale: PLuVector; aDDpi,
+  aHDpi, aVDpi: System.PSingle);
 begin
   if not IsOpen then Exit;
   if Assigned(aSize) then
@@ -24690,36 +24796,44 @@ begin
   Result.Height := LRect.h;
 end;
 
-class procedure TLuWindow.DrawPoint(const aX, aY: Single; const aColor: TLuColor);
+class procedure TLuWindow.DrawPoint(const aX, aY: Single;
+  const aColor: TLuColor);
 begin
   if not IsOpen then Exit;
-  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue, aColor.Alpha);
+  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue,
+    aColor.Alpha);
   SDL_RenderDrawPointF(FRenderer, aX, aY);
 end;
 
-class procedure TLuWindow.DrawLine(const aX1, aY1, aX2, aY2: Single; const aColor: TLuColor);
+class procedure TLuWindow.DrawLine(const aX1, aY1, aX2, aY2: Single;
+  const aColor: TLuColor);
 begin
   if not IsOpen then Exit;
-  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue, aColor.Alpha);
+  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue,
+    aColor.Alpha);
   SDL_RenderDrawLineF(FRenderer, aX1, aY1, aX2, aY2);
 end;
 
-class procedure TLuWindow.DrawRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor);
+class procedure TLuWindow.DrawRect(const aX, aY, aWidth, aHeight: Single;
+  const aColor: TLuColor);
 var
   LRect: SDL_FRect;
 begin
   if not IsOpen then Exit;
-  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue, aColor.Alpha);
+  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue,
+    aColor.Alpha);
   LRect.x := aX; LRect.y := aY; LRect.w := aWidth; LRect.h := aHeight;
   SDL_RenderDrawRectF(FRenderer, @LRect);
 end;
 
-class procedure TLuWindow.DrawFilledRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor);
+class procedure TLuWindow.DrawFilledRect(const aX, aY, aWidth, aHeight: Single;
+  const aColor: TLuColor);
 var
   LRect: SDL_FRect;
 begin
   if not IsOpen then Exit;
-  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue, aColor.Alpha);
+  SDL_SetRenderDrawColor(FRenderer, aColor.Red, aColor.Green, aColor.BLue,
+    aColor.Alpha);
   LRect.x := aX; LRect.y := aY; LRect.w := aWidth; LRect.h := aHeight;
   SDL_RenderFillRectF(FRenderer, @LRect);
 end;
@@ -24739,7 +24853,8 @@ begin
   inherited;
 end;
 
-function  TLuFont.LoadDefault(aSize, aStyle: Cardinal): Boolean;
+function  TLuFont.LoadDefault(const aSize: Cardinal;
+  const aStyle: TLuFontStyle): Boolean;
 const
   cDefaultFontResName = '403cefa4f0e44bccbd8d9a67e30208cc';
 var
@@ -24750,27 +24865,41 @@ var
 begin
   Result := False;
   if not Game.ResourceExists(HInstance, cDefaultFontResName) then Exit;
-  LResStream := TResourceStream.Create(HInstance, cDefaultFontResName, RT_RCDATA);
+
+  LResStream := TResourceStream.Create(HInstance, cDefaultFontResName,
+    RT_RCDATA);
+
   LRWops := Game.GetMemRWops(LResStream.Memory, LResStream.Size);
   if not Assigned(LRWops) then Exit;
+
   Game.GetWindowInfo(nil, nil, nil, nil, @LHdpi, @LVDpi);
-  LHandle := TTF_OpenFontDPIRW(LRWops, SDL_True, aSize, Round(LHdpi), Round(LVdpi));
+
+  LHandle := TTF_OpenFontDPIRW(LRWops, SDL_True, aSize, Round(LHdpi),
+    Round(LVdpi));
+
   if not Assigned(LHandle) then Exit;
   Unload;
+
   FResStream := LResStream;
   FHandle := LHandle;
-  FTexture := SDL_CreateTexture(Game.GetWindowRendererHandle, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+  FTexture := SDL_CreateTexture(Game.GetWindowRendererHandle,
+    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH,
+    TEXTURE_HEIGHT);
+
   SDL_SetTextureBlendMode(FTexture, SDL_BLENDMODE_BLEND);
   TTF_SetFontHinting(FHandle, TTF_HINTING_LIGHT_SUBPIXEL);
-  TTF_SetFontStyle(FHandle, aStyle);
+  TTF_SetFontStyle(FHandle, Ord(aStyle));
   FHeight := TTF_FontHeight(FHandle);
   FGlyphCache := TDictionary<Cardinal, TFontGlyphCache>.Create;
+
   AddTextCharRange(32, 126);
   AddTextChars('™©');
   Result := True;
 end;
 
-function  TLuFont.Load(aArchive: TLuArchive; const aFilename: string; aSize, aStyle: Cardinal): Boolean;
+function  TLuFont.Load(const aArchive: TLuArchive; const aFilename: string;
+  const aSize: Cardinal; const aStyle: TLuFontStyle): Boolean;
 var
   LRWops: PSDL_RWops;
   LHandle: PTTF_Font;
@@ -24785,16 +24914,25 @@ begin
 
   if not Assigned(LRWops) then Exit;
   Game.GetWindowInfo(nil, nil, nil, nil, @LHdpi, @LVDpi);
-  LHandle := TTF_OpenFontDPIRW(LRWops, SDL_True, aSize, Round(LHdpi), Round(LVdpi));
+  LHandle := TTF_OpenFontDPIRW(LRWops, SDL_True, aSize, Round(LHdpi),
+    Round(LVdpi));
   if not Assigned(LHandle) then Exit;
+
   Unload;
+
   FHandle := LHandle;
-  FTexture := SDL_CreateTexture(Game.GetWindowRendererHandle, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+  FTexture := SDL_CreateTexture(Game.GetWindowRendererHandle,
+    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH,
+    TEXTURE_HEIGHT);
   SDL_SetTextureBlendMode(FTexture, SDL_BLENDMODE_BLEND);
+
   TTF_SetFontHinting(FHandle, TTF_HINTING_LIGHT_SUBPIXEL);
-  TTF_SetFontStyle(FHandle, aStyle);
+  TTF_SetFontStyle(FHandle, Ord(aStyle));
+
   FHeight := TTF_FontHeight(FHandle);
   FGlyphCache := TDictionary<Cardinal, TFontGlyphCache>.Create;
+
   AddTextCharRange(32, 126);
   AddTextChars('™©');
   Result := True;
@@ -24838,21 +24976,14 @@ begin
   if FPos.x > TEXTURE_WIDTH then Exit;
   if FPos.y > TEXTURE_HEIGHT then Exit;
 
-  LColor.r := 255;
-  LColor.g := 255;
-  LColor.b := 255;
-  LColor.a := 255;
-
-  LBColor.r := 0;
-  LBColor.g := 255;
-  LBColor.b := 0;
-  LBColor.a := 0;
-
+  LColor.r := 255; LColor.g := 255; LColor.b := 255; LColor.a := 255;
+  LBColor.r := 0; LBColor.g := 255; LBColor.b := 0; LBColor.a := 0;
 
   TTF_GlyphMetrics(FHandle, aChar, nil, nil, nil, nil, @GlyphCache.Advance);
   LCharStr := Char(aChar);
 
-  LSurface := TTF_RenderUTF8_Blended(FHandle, Game.Marshaller.AsUtf8(PChar(LCharStr)).ToPointer, LColor);
+  LSurface := TTF_RenderUTF8_Blended(FHandle,
+    Game.Marshaller.AsUtf8(PChar(LCharStr)).ToPointer, LColor);
   SDL_SetSurfaceBlendMode(LSurface, SDL_BLENDMODE_NONE);
 
   GlyphCache.Rect.x := FPos.x;
@@ -24863,12 +24994,10 @@ begin
   SDL_LockTextureToSurface(FTexture, @GlyphCache.Rect, @LTextureSurface);
   SDL_UpperBlit(LSurface, nil, LTextureSurface, nil);
 
-
   if (FPos.x + LSurface.w) > (TEXTURE_WIDTH - LSurface.w) then
     begin
       FPos.x := 0;
       if (FPos.y + FHeight) > (TEXTURE_HEIGHT - FHeight) then Halt;
-
       FPos.y := FPos.y + FHeight;
     end
   else
@@ -24885,9 +25014,7 @@ var
 begin
   LCh := Ord(aChar);
   if not FGlyphCache.ContainsKey(LCh) then
-  begin
     AddGlyph(LCh);
-  end;
 end;
 
 procedure TLuFont.AddTextChars(const aChars: string);
@@ -24898,9 +25025,7 @@ begin
 
   LLen := aChars.Length;
   for I := 1 to LLen do
-  begin
     AddTextChar(aChars[I]);
-  end;
 end;
 
 procedure TLuFont.AddTextCharRange(const aFrom, aTo: Cardinal);
@@ -24910,13 +25035,12 @@ begin
   for LCh := aFrom to aTo do
   begin
     if not FGlyphCache.ContainsKey(LCh) then
-    begin
       AddGlyph(LCh);
-    end;
   end;
 end;
 
-procedure TLuFont.DrawText(const aX, aY: Single; const aColor: TLuColor; const aHAlign: Cardinal; const aMsg: string; const aArgs: array of const);
+procedure TLuFont.DrawText(const aX, aY: Single; const aColor: TLuColor;
+  const aHAlign: TLuHAlign; const aMsg: string; const aArgs: array of const);
 var
   I, LCh, LLen: Integer;
   LGc: TFontGlyphCache;
@@ -24936,15 +25060,15 @@ begin
   Game.GetWindowViewport(LVP);
 
   case aHAlign of
-    cLuHALIGN_LEFT:
+    haLeft:
       begin
       end;
-    cLuHALIGN_CENTER:
+    haCenter:
       begin
         TextSize(aMsg, aArgs, @LTW, @LTH);
         LX := (LVP.Width - LTW)/2;
       end;
-    cLuHALIGN_RIGHT:
+    haRight:
       begin
         TextSize(aMsg, aArgs, @LTW, @LTH);
         LX := (LVP.Height - LTW);
@@ -24964,19 +25088,23 @@ begin
       LDestRect.y := Round(LY);
       LDestRect.w := LGC.Rect.w;
       LDestRect.h := LGC.Rect.h;
-      SDL_RenderCopy(Game.GetWindowRendererHandle, FTexture, @LGC.Rect, @LDestRect);
+      SDL_RenderCopy(Game.GetWindowRendererHandle, FTexture, @LGC.Rect,
+        @LDestRect);
       LX := LX + LGc.Advance;
     end;
   end;
 end;
 
-procedure TLuFont.DrawText(const aX: Single; var aY: Single; const aLineSpace: Single; const aColor: TLuColor; const aHAlign: Cardinal; const aMsg: string; const aArgs: array of const);
+procedure TLuFont.DrawText(const aX: Single; var aY: Single;
+  const aLineSpace: Single; const aColor: TLuColor; const aHAlign: TLuHAlign;
+  const aMsg: string; const aArgs: array of const);
 begin
   DrawText(aX, aY, aColor, aHAlign, aMsg, aArgs);
   aY := aY + FHeight + aLineSpace;
 end;
 
-procedure TLuFont.TextSize(const aMsg: string; const aArgs: array of const; aWidth: PInteger; aHeight: PInteger);
+procedure TLuFont.TextSize(const aMsg: string; const aArgs: array of const;
+  aWidth: PInteger; aHeight: PInteger);
 var
   I, LCh, LLen, LW, LH: Integer;
   LGc: TFontGlyphCache;
@@ -25029,7 +25157,8 @@ begin
   SDL_UnlockTexture(LVideo.FTexture);
 end;
 
-procedure OnDecodeAudio(aPlm: pplm_t; aSamples: pplm_samples_t; aUserData: Pointer); cdecl;
+procedure OnDecodeAudio(aPlm: pplm_t; aSamples: pplm_samples_t;
+  aUserData: Pointer); cdecl;
 var
   LVideo: PVideo;
   LSize: Cardinal;
@@ -25065,9 +25194,11 @@ begin
   LVideo := aUserData;
   if not Assigned(LVideo) then Exit;
 
-  LBytesRead := LVideo.FRWops.read(LVideo.FRWops, @LVideo.FStaticPlmBuffer[0], PLM_BUFFER_DEFAULT_SIZE, 1);
+  LBytesRead := LVideo.FRWops.read(LVideo.FRWops, @LVideo.FStaticPlmBuffer[0],
+    PLM_BUFFER_DEFAULT_SIZE, 1);
   if LBytesRead <> 0 then
-    plm_buffer_write(aBuffer, @LVideo.FStaticPlmBuffer[0], PLM_BUFFER_DEFAULT_SIZE)
+    plm_buffer_write(aBuffer, @LVideo.FStaticPlmBuffer[0],
+      PLM_BUFFER_DEFAULT_SIZE)
   else
     begin
       if LVideo.FLoop > 0 then
@@ -25075,18 +25206,20 @@ begin
       else
         if LVideo.FLoop = 0 then
         begin
-          LVideo.Status := LuVIDEOSTATUS_STOPPED;
+          LVideo.FStatus := vsStopped;
           LVideo.FStopFlag := True;
           Exit;
         end;
 
       if Assigned(LVideo.FPlm) then plm_rewind(LVideo.FPlm);
-      if Assigned(LVideo.FRWops) then LVideo.FRWops.seek(LVideo.FRWops, 0, RW_SEEK_SET);
+      if Assigned(LVideo.FRWops) then LVideo.FRWops.seek(LVideo.FRWops, 0,
+        RW_SEEK_SET);
       if LVideo.FAudioDevice <> 0 then SDL_ClearQueuedAudio(LVideo.FAudioDevice);
     end;
 end;
 
-class procedure TVideo.DoVideoStatus(const aStatus: Cardinal; const aFilename: string);
+class procedure TVideo.DoVideoStatus(const aStatus: TLuVideoStatus;
+  const aFilename: string);
 begin
   if not Assigned(Game) then Exit;
   Game.OnVideoStatus(aStatus, aFilename);
@@ -25102,7 +25235,8 @@ begin
   Unload;
 end;
 
-class function  TVideo.Load(const aArchive: TLuArchive; const aFilename: string): Boolean;
+class function  TVideo.Load(const aArchive: TLuArchive;
+  const aFilename: string): Boolean;
 var
   LBuffer: pplm_buffer_t;
 begin
@@ -25134,26 +25268,26 @@ begin
   FAudioSpec.samples := LuVideoSampleBuffSize;
   FAudioDevice := SDL_OpenAudioDevice(nil, 0, @FAudioSpec, nil, 0);
   SDL_PauseAudioDevice(FAudioDevice, 0);
-  plm_set_audio_lead_time(FPlm, (FAudioSpec.samples*FAudioSpec.channels)/FAudioSampleRate);
+  plm_set_audio_lead_time(FPlm,
+    (FAudioSpec.samples*FAudioSpec.channels)/FAudioSampleRate);
 
   FWidth := plm_get_width(FPlm);
   FHeight := plm_get_height(FPlm);
   FVolume := 1.0;
 
-
-  FTexture := SDL_CreateTexture(Game.GetWindowRendererHandle, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FWidth, FHeight);
+  FTexture := SDL_CreateTexture(Game.GetWindowRendererHandle,
+    SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, FWidth, FHeight);
   if not Assigned(FTexture) then
     begin
     Unload;
     Exit;
   end;
 
-
   plm_set_video_decode_callback(FPlm, OnDecodeVideo, Game.GetVideoHandle);
   plm_set_audio_decode_callback(FPlm, OnDecodeAudio, Game.GetVideoHandle);
 
   FFilename := aFilename;
-  Status := LuVIDEOSTATUS_STOPPED;
+  FStatus := vsStopped;
 
   Result := True;
 end;
@@ -25182,7 +25316,7 @@ begin
   FHeight := 0;
   FVolume := 0;
   FFrameRate := 0;
-  Status := LuVIDEOSTATUS_STOPPED;
+  FStatus := vsStopped;
   FStopFlag := False;
   FLoop := 0;
 end;
@@ -25193,26 +25327,26 @@ begin
 
   FVolume := aVolume;
   FLoop := aLoop;
-  Status := LuVIDEOSTATUS_PLAYING;
-  DoVideoStatus(Status, FFilename);
+  FStatus := vsPlaying;
+  DoVideoStatus(FStatus, FFilename);
 end;
 
 class procedure TVideo.Pause(const aPause: Boolean);
 begin
   if FFilename.IsEmpty then Exit;
   if aPause then
-    Status := LuVIDEOSTATUS_PAUSED
+    FStatus := vsPaused
   else
-    Status := LuVIDEOSTATUS_PLAYING;
-  DoVideoStatus(Status, FFilename);
+    FStatus := vsPlaying;
+  DoVideoStatus(FStatus, FFilename);
 end;
 
 class procedure TVideo.Stop;
 begin
   if FFilename.IsEmpty then Exit;
   Rewind;
-  Status := LuVIDEOSTATUS_STOPPED;
-  DoVideoStatus(Status, FFilename);
+  FStatus := vsStopped;
+  DoVideoStatus(FStatus, FFilename);
 end;
 
 class procedure TVideo.Rewind;
@@ -25227,9 +25361,9 @@ begin
   SDL_ClearQueuedAudio(FAudioDevice);
 end;
 
-class function  TVideo.GetStatus: Cardinal;
+class function  TVideo.GetStatus: TLuVideoStatus;
 begin
-  Result := Status;
+  Result := FStatus;
 end;
 
 class function  TVideo.GetWidth: Cardinal;
@@ -25262,11 +25396,11 @@ begin
   if FStopFlag then
   begin
     FStopFlag := False;
-    DoVideoStatus(Status, FFilename);
+    DoVideoStatus(FStatus, FFilename);
     Exit;
   end;
 
-  if Status <> LuVIDEOSTATUS_PLAYING then Exit;
+  if FStatus <> vsPlaying then Exit;
   if not Assigned(FPlm) then Exit;
   plm_decode(FPlm, aDeltaTime);
 end;
@@ -25276,7 +25410,7 @@ var
   LRect: SDL_FRect;
 begin
   if not Assigned(FTexture) then Exit;
-  if Status <> LuVIDEOSTATUS_PLAYING then Exit;
+  if FStatus <> vsPlaying then Exit;
 
   LRect.X := aX;
   LRect.Y := aY;
@@ -25382,7 +25516,8 @@ begin
   FWorldPoint[FItemCount-1].Y := 0;
 end;
 
-function  TLuPolygon.Transform(const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector): Boolean;
+function  TLuPolygon.Transform(const aX, aY, aScale, aAngle: Single;
+  const aFlipMode: TLuFlipMode; const aOrigin: PLuVector): Boolean;
 var
   I: Integer;
   P: TLuVector;
@@ -25403,16 +25538,16 @@ begin
     end;
 
     case aFlipMode of
-      cLuFLIP_NONE:
+      fmNone:
         begin
         end;
 
-      cLuFLIP_VERTICAL:
+      fmVertical:
         begin
           P.Y := -P.Y;
         end;
 
-      cLuFLIP_HORIZONTAL:
+      fmHorizontal:
         begin
           P.X := -P.X;
         end;
@@ -25433,7 +25568,8 @@ begin
   Result := True;
 end;
 
-procedure TLuPolygon.Render(const aX, aY, aScale, aAngle, aWidth: Single; aColor: TLuColor; aFlipMode: Integer; aOrigin: PLuVector);
+procedure TLuPolygon.Render(const aX, aY, aScale, aAngle, aWidth: Single;
+  aColor: TLuColor; aFlipMode: TLuFlipMode; aOrigin: PLuVector);
 var
   I: Integer;
   X0,Y0,X1,Y1: Integer;
@@ -25453,7 +25589,8 @@ begin
   end;
 end;
 
-procedure TLuPolygon.SetSegmentVisible(const aIndex: Integer; const aVisible: Boolean);
+procedure TLuPolygon.SetSegmentVisible(const aIndex: Integer;
+  const aVisible: Boolean);
 begin
   FSegment[aIndex].Visible := True;
 end;
@@ -25487,7 +25624,8 @@ begin
   Result := (Abs(X2 - X1) <= 1) and (Abs(Y2 - Y1) <= 1);
 end;
 
-class function TLuPolypointTrace.IsPixEmpty(Tex: TLuTexture; X, Y, W, H: Integer): Boolean;
+class function TLuPolypointTrace.IsPixEmpty(Tex: TLuTexture; X, Y, W,
+  H: Integer): Boolean;
 var
   Color: TLuColor;
 begin
@@ -25500,7 +25638,8 @@ begin
   end;
 end;
 
-class procedure TLuPolypointTrace.FindStartingPoint(Tex: TLuTexture; var X, Y: Integer; W, H: Integer);
+class procedure TLuPolypointTrace.FindStartingPoint(Tex: TLuTexture; var X,
+  Y: Integer; W, H: Integer);
 var
   I, J: Integer;
 begin
@@ -25529,7 +25668,8 @@ begin
   end;
 end;
 
-class function  TLuPolypointTrace.CountEmptyAround(Tex: TLuTexture; X, Y, W, H: Integer): Integer;
+class function  TLuPolypointTrace.CountEmptyAround(Tex: TLuTexture; X, Y, W,
+  H: Integer): Integer;
 var
   I: Integer;
 begin
@@ -25539,7 +25679,9 @@ begin
       Inc(Result);
 end;
 
-class function  TLuPolypointTrace.FindNearestButNotNeighbourOfOther(Tex: TLuTexture; Xs, Ys, XOther, YOther: Integer; var XF, YF: Integer; W, H: Integer): Boolean;
+class function  TLuPolypointTrace.FindNearestButNotNeighbourOfOther(
+  Tex: TLuTexture; Xs, Ys, XOther, YOther: Integer; var XF, YF: Integer; W,
+  H: Integer): Boolean;
 var
   I, MaxEmpty, E: Integer;
   Xt, Yt: Integer;
@@ -25574,7 +25716,8 @@ begin
   Result := Sqrt(A * A + B * B);
 end;
 
-class function TLuPolypointTrace.TriangleThinness(X1, Y1, X2, Y2, X3, Y3: Integer): Extended;
+class function TLuPolypointTrace.TriangleThinness(X1, Y1, X2, Y2, X3,
+  Y3: Integer): Extended;
 var
   P: Extended;
   A, B, C, S: Extended;
@@ -25600,7 +25743,8 @@ begin
   end;
 end;
 
-class procedure TLuPolypointTrace.Init(aMju: Extended; aMaxStepBack: Integer; aAlphaThreshold: Byte);
+class procedure TLuPolypointTrace.Init(aMju: Extended; aMaxStepBack: Integer;
+  aAlphaThreshold: Byte);
 begin
   Done;
   Mju := aMju;
@@ -25641,7 +25785,8 @@ begin
   Result := PntCount;
 end;
 
-class procedure TLuPolypointTrace.PrimaryTrace(const Tex: TLuTexture; const W, H: Integer);
+class procedure TLuPolypointTrace.PrimaryTrace(const Tex: TLuTexture; const W,
+  H: Integer);
 var
   I: Integer;
   Xn, Yn, Xnn, Ynn: Integer;
@@ -25719,7 +25864,8 @@ begin
   end;
 end;
 
-class procedure TLuPolypointTrace.ApplyPolyPoint(aPolyPoint: TLuPolyPoint; aNum: Integer; aOrigin: PLuVector);
+class procedure TLuPolypointTrace.ApplyPolyPoint(aPolyPoint: TLuPolyPoint;
+  aNum: Integer; aOrigin: PLuVector);
 var
   I: Integer;
 begin
@@ -25772,7 +25918,8 @@ procedure TLuPolyPoint.CopyFrom(const aPolyPoint: TLuPolyPoint);
 begin
 end;
 
-procedure TLuPolyPoint.AddPoint(const aNum: Integer; const aX, aY: Single; const aOrigin: PLuVector);
+procedure TLuPolyPoint.AddPoint(const aNum: Integer; const aX, aY: Single;
+  const aOrigin: PLuVector);
 var
   X,Y: Single;
 begin
@@ -25788,7 +25935,9 @@ begin
   FPolygon[aNum].AddLocalPoint(X, Y, True);
 end;
 
-function  TLuPolyPoint.TraceFromTexture(const aTexture: TLuTexture; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector): Integer;
+function  TLuPolyPoint.TraceFromTexture(const aTexture: TLuTexture;
+  const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer;
+  const aOrigin: PLuVector): Integer;
 var
   I: Integer;
   W,H: Integer;
@@ -25809,7 +25958,9 @@ begin
   Result := I;
 end;
 
-procedure TLuPolyPoint.TraceFromSprite(const aSprite: TLuSprite; const aGroup: Integer; const aMju: Single; const aMaxStepBack, aAlphaThreshold: Integer; const aOrigin: PLuVector);
+procedure TLuPolyPoint.TraceFromSprite(const aSprite: TLuSprite;
+  const aGroup: Integer; const aMju: Single; const aMaxStepBack,
+  aAlphaThreshold: Integer; const aOrigin: PLuVector);
 var
   I: Integer;
   Rect: TLuRect;
@@ -25841,15 +25992,20 @@ begin
   Result := FCount;
 end;
 
-procedure TLuPolyPoint.Render(const aNum: Integer; aX, aY, aScale, aAngle: Single; const aColor: TLuColor; const aFlipMode: Integer; const aOrigin: PLuVector);
+procedure TLuPolyPoint.Render(const aNum: Integer; aX, aY, aScale,
+  aAngle: Single; const aColor: TLuColor; const aFlipMode: TLuFlipMode;
+  const aOrigin: PLuVector);
 begin
   if aNum >= FCount then Exit;
   FPolygon[aNum].Render(aX, aY, aScale, aAngle, 1, aColor, aFlipMode, aOrigin);
 end;
 
-function  TLuPolyPoint.Collide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
-  const aPolyPoint2: TLuPolyPoint; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer;
-  const aOrigin2: PLuVector; var aHitPos: TLuVector): Boolean;
+function  TLuPolyPoint.Collide(const aNum1, aGroup1: Integer; const aX1, aY1,
+  aScale1, aAngle1: Single; const aFlipMode1: TLuFlipMode;
+  const aOrigin1: PLuVector; const aPolyPoint2: TLuPolyPoint; const aNum2,
+  aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single;
+  const aFlipMode2: TLuFlipMode; const aOrigin2: PLuVector;
+  var aHitPos: TLuVector): Boolean;
 var
   L1,L2,IX,IY: Integer;
   Cnt1, Cnt2: Integer;
@@ -25898,7 +26054,9 @@ begin
 
 end;
 
-function  TLuPolyPoint.CollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
+function  TLuPolyPoint.CollidePoint(const aNum, aGroup: Integer; const aX, aY,
+  aScale, aAngle: Single; const aFlipMode: TLuFlipMode;
+  const aOrigin: PLuVector; var aPoint: TLuVector): Boolean;
 var
   L1,IX,IY: Integer;
   Cnt1: Integer;
@@ -25998,7 +26156,8 @@ begin
   inherited;
 end;
 
-function  TLuSprite.LoadPage(const aArchive: TLuArchive; const aFilename: string; const aColorKey: PLuColor): Integer;
+function  TLuSprite.LoadPage(const aArchive: TLuArchive;
+  const aFilename: string; const aColorKey: PLuColor): Integer;
 begin
   Result := FPageCount;
   Inc(FPageCount);
@@ -26015,7 +26174,8 @@ begin
   FGroup[Result].PolyPoint := TLuPolyPoint.Create;
 end;
 
-function  TLuSprite.AddImageFromRect(const aPage, aGroup: Integer; const aRect: TLuRect): Integer;
+function  TLuSprite.AddImageFromRect(const aPage, aGroup: Integer;
+  const aRect: TLuRect): Integer;
 begin
   Result := FGroup[aGroup].Count;
   Inc(FGroup[aGroup].Count);
@@ -26028,7 +26188,8 @@ begin
   FGroup[aGroup].Image[Result].Page   := aPage;
 end;
 
-function  TLuSprite.AddImageFromGrid(const aPage, aGroup, aGridX, aGridY, aGridWidth: Integer; aGridHeight: Integer): Integer;
+function  TLuSprite.AddImageFromGrid(const aPage, aGroup, aGridX, aGridY,
+  aGridWidth: Integer; aGridHeight: Integer): Integer;
 begin
   Result := FGroup[aGroup].Count;
   Inc(FGroup[aGroup].Count);
@@ -26061,7 +26222,10 @@ begin
   Result := FTexture[FGroup[aGroup].Image[aNum].Page];
 end;
 
-procedure TLuSprite.RenderImage(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector; const aColor: TLuColor; const aBlendMode: Cardinal; const aRenderPolyPoint: Boolean=false);
+procedure TLuSprite.RenderImage(const aNum, aGroup: Integer; const aX, aY,
+  aScale, aAngle: Single; const aFlipMode: TLuFlipMode;
+  const aOrigin: PLuVector; const aColor: TLuColor;
+  const aBlendMode: TLuBlendMode; const aRenderPolyPoint: Boolean=false);
 var
   PageNum: Integer;
   RectP  : PLuRect;
@@ -26069,7 +26233,8 @@ var
 begin
   RectP   := @FGroup[aGroup].Image[aNum].Rect;
   PageNum := FGroup[aGroup].Image[aNum].Page;
-  FTexture[PageNum].Render(RectP, aX, aY, aScale, aAngle, aFlipMode, aOrigin, aColor, aBlendMode);
+  FTexture[PageNum].Render(RectP, aX, aY, aScale, aAngle, aFlipMode, aOrigin,
+    aColor, aBlendMode);
 
   if aRenderPolyPoint then
   begin
@@ -26083,7 +26248,8 @@ begin
       oxy.X := Round(oxy.X * aOrigin.X);
       oxy.Y := Round(oxy.Y * aOrigin.Y);
     end;
-   FGroup[aGroup].PolyPoint.Render(aNum, aX, aY, aScale, aAngle, cLuYELLOW, aFlipMode, @oxy);
+   FGroup[aGroup].PolyPoint.Render(aNum, aX, aY, aScale, aAngle, cLuYELLOW,
+    aFlipMode, @oxy);
   end;
 
 end;
@@ -26098,13 +26264,19 @@ begin
   Result := FGroup[aGroup].PolyPoint;
 end;
 
-procedure TLuSprite.GroupPolyPointTrace(const aGroup: Integer; const aMju: Single=6; const aMaxStepBack: Integer=12; const aAlphaThreshold: Integer=70; const aOrigin: PLuVector=nil);
+procedure TLuSprite.GroupPolyPointTrace(const aGroup: Integer;
+  const aMju: Single=6; const aMaxStepBack: Integer=12;
+  const aAlphaThreshold: Integer=70; const aOrigin: PLuVector=nil);
 begin
-  FGroup[aGroup].PolyPoint.TraceFromSprite(Self, aGroup, aMju, aMaxStepBack, aAlphaThreshold, aOrigin);
+  FGroup[aGroup].PolyPoint.TraceFromSprite(Self, aGroup, aMju, aMaxStepBack,
+    aAlphaThreshold, aOrigin);
 end;
 
-function  TLuSprite.GroupPolyPointCollide(const aNum1, aGroup1: Integer; const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: Integer; const aOrigin1: PLuVector;
-  const aSprite2: TLuSprite; const aNum2, aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single; const aFlipMode2: Integer; const aOrigin2: PLuVector;
+function  TLuSprite.GroupPolyPointCollide(const aNum1, aGroup1: Integer;
+  const aX1, aY1, aScale1, aAngle1: Single; const aFlipMode1: TLuFlipMode;
+  const aOrigin1: PLuVector; const aSprite2: TLuSprite; const aNum2,
+  aGroup2: Integer; const aX2, aY2, aScale2, aAngle2: Single;
+  const aFlipMode2: TLuFlipMode; const aOrigin2: PLuVector;
   const aShrinkFactor: Single; var aHitPos: TLuVector): Boolean;
 var
   PP1,PP2: TLuPolyPoint;
@@ -26129,8 +26301,8 @@ begin
   Radius2 := (aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height +
               aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width) / 2;
 
-  if not Game.RadiusOverlap(Radius1, aX1, aY1, Radius2, aX2, aY2, aShrinkFactor) then Exit;
-
+  if not Game.RadiusOverlap(Radius1, aX1, aY1, Radius2, aX2, aY2,
+    aShrinkFactor) then Exit;
 
   Origini2.X := aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width;
   Origini2.Y := aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height;
@@ -26146,18 +26318,22 @@ begin
   Origini2P  := nil;
   if aOrigin2 <> nil then
   begin
-    Origini2.X := Round(aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width  * aOrigin2.X);
-    Origini2.Y := Round(aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height * aOrigin2.Y);
+    Origini2.X := Round(aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Width
+      * aOrigin2.X);
+    Origini2.Y := Round(aSprite2.FGroup[aGroup2].Image[aNum2].Rect.Height
+      * aOrigin2.Y);
     Origini2P  := @Origini2;
   end;
 
-
-  Result := PP1.Collide(aNum1, aGroup1, aX1, aY1, aScale1, aAngle1, aFlipMode1, Origini1P,
-                        PP2, aNum2, aGroup2, aX2, aY2, aScale2, aAngle2, aFlipMode2, Origini2P, aHitPos);
+  Result := PP1.Collide(aNum1, aGroup1, aX1, aY1, aScale1, aAngle1, aFlipMode1,
+    Origini1P, PP2, aNum2, aGroup2, aX2, aY2, aScale2, aAngle2, aFlipMode2,
+    Origini2P, aHitPos);
 end;
 
-function  TLuSprite.GroupPolyPointCollidePoint(const aNum, aGroup: Integer; const aX, aY, aScale, aAngle: Single; const aFlipMode: Integer; const aOrigin: PLuVector;
-  const aShrinkFactor: Single; var aPoint: TLuVector): Boolean;
+function  TLuSprite.GroupPolyPointCollidePoint(const aNum, aGroup: Integer;
+  const aX, aY, aScale, aAngle: Single; const aFlipMode: TLuFlipMode;
+  const aOrigin: PLuVector; const aShrinkFactor: Single;
+  var aPoint: TLuVector): Boolean;
 var
   PP1: TLuPolyPoint;
   Radius1: Single;
@@ -26177,9 +26353,8 @@ begin
 
   Radius2 := 2;
 
-  if not Game.RadiusOverlap(Radius1, aX, aY, Radius2, aPoint.X, aPoint.Y, aShrinkFactor) then
-    Exit;
-
+  if not Game.RadiusOverlap(Radius1, aX, aY, Radius2, aPoint.X, aPoint.Y,
+    aShrinkFactor) then Exit;
 
   Origini1P  := nil;
   if aOrigin <> nil then
@@ -26189,7 +26364,8 @@ begin
     Origini1P  := @Origini1;
   end;
 
-  Result := PP1.CollidePoint(aNum, aGroup, aX, aY, aScale, aAngle, aFlipMode, Origini1P, aPoint);
+  Result := PP1.CollidePoint(aNum, aGroup, aX, aY, aScale, aAngle, aFlipMode,
+    Origini1P, aPoint);
 end;
 
 {$ENDREGION}
@@ -26205,7 +26381,7 @@ begin
   inherited;
 end;
 
-procedure TLuEntity.Init(aSprite: TLuSprite; aGroup: Integer);
+procedure TLuEntity.Init(const aSprite: TLuSprite; const aGroup: Integer);
 begin
   FSprite      := aSprite;
   FGroup       := aGroup;
@@ -26215,19 +26391,19 @@ begin
   FAngle       := 0;
   FAngleOffset := 0;
   FColor       := WHITE;
-  FFlipMode    := cLuFLIP_NONE;
+  FFlipMode    := fmNone;
   FLoopFrame   := True;
   FShrinkFactor:= 1.0;
   FOrigin.X := 0.5;
   FOrigin.Y := 0.5;
   FRenderPolyPoint := False;
-  FBlendMode := cLuBLENDMODE_BLEND;
+  FBlendMode := bmBlend;
   SetPosAbs(0, 0);
   SetFrameRange(0, aSprite.ImageCount(FGroup)-1);
   SetFrame(FFrame);
 end;
 
-procedure TLuEntity.SetFrameRange(aFirst: Integer; aLast: Integer);
+procedure TLuEntity.SetFrameRange(const aFirst, aLast: Integer);
 begin
   FFirstFrame := aFirst;
   FLastFrame  := aLast;
@@ -26270,7 +26446,7 @@ begin
   SetFrame(FFrame);
 end;
 
-procedure TLuEntity.SetPosAbs(aX: Single; aY: Single);
+procedure TLuEntity.SetPosAbs(const aX, aY: Single);
 begin
   FPos.X := aX;
   FPos.Y := aY;
@@ -26278,7 +26454,7 @@ begin
   FDir.Y := 0;
 end;
 
-procedure TLuEntity.SetPosRel(aX: Single; aY: Single);
+procedure TLuEntity.SetPosRel(const aX, aY: Single);
 begin
   FPos.X := FPos.X + aX;
   FPos.Y := FPos.Y + aY;
@@ -26286,39 +26462,46 @@ begin
   FDir.Y := aY;
 end;
 
-procedure TLuEntity.ScaleAbs(aScale: Single);
+procedure TLuEntity.ScaleAbs(const aScale: Single);
 begin
   FScale := aScale;
   SetFrame(FFrame);
 end;
 
-procedure TLuEntity.ScaleRel(aScale: Single);
+procedure TLuEntity.ScaleRel(const aScale: Single);
 begin
   FScale := FScale + aScale;
   SetFrame(FFrame);
 end;
 
-procedure TLuEntity.SetAngleOffset(aAngle: Single);
+procedure TLuEntity.SetAngleOffset(const aAngle: Single);
+var
+  LAngle: Single;
 begin
-  aAngle := aAngle + FAngleOffset;
-  Game.ClipValuef(aAngle, 0, 360, True);
-  FAngleOffset := aAngle;
+  LAngle := aAngle + FAngleOffset;
+  Game.ClipValuef(LAngle, 0, 360, True);
+  FAngleOffset := LAngle;
 end;
 
-procedure TLuEntity.RotateAbs(aAngle: Single);
+procedure TLuEntity.RotateAbs(const aAngle: Single);
+var
+  LAngle: Single;
 begin
-  Game.ClipValuef(aAngle, 0, 360, True);
-  FAngle := aAngle;
+  LAngle := aAngle;
+  Game.ClipValuef(LAngle, 0, 360, True);
+  FAngle := LAngle;
 end;
 
-procedure TLuEntity.RotateRel(aAngle: Single);
+procedure TLuEntity.RotateRel(const aAngle: Single);
+var
+  LAngle: Single;
 begin
-  aAngle := aAngle + FAngle;
-  Game.ClipValuef(aAngle, 0, 360, True);
-  FAngle := aAngle;
+  LAngle := aAngle + FAngle;
+  Game.ClipValuef(LAngle, 0, 360, True);
+  FAngle := LAngle;
 end;
 
-function  TLuEntity.RotateToAngle(aAngle: Single; aSpeed: Single): Boolean;
+function  TLuEntity.RotateToAngle(const aAngle, aSpeed: Single): Boolean;
 var
   Step: Single;
   Len : Single;
@@ -26338,7 +26521,7 @@ begin
   end;
 end;
 
-function  TLuEntity.RotateToPos(aX: Single; aY: Single; aSpeed: Single): Boolean;
+function  TLuEntity.RotateToPos(const aX, aY, aSpeed: Single): Boolean;
 var
   Angle: Single;
   Step : Single;
@@ -26364,7 +26547,8 @@ begin
   end;
 end;
 
-function  TLuEntity.RotateToPosAt(aSrcX: Single; aSrcY: Single; aDestX: Single; aDestY: Single; aSpeed: Single): Boolean;
+function  TLuEntity.RotateToPosAt(const aSrcX, aSrcY, aDestX, aDestY,
+  aSpeed: Single): Boolean;
 var
   Angle: Single;
   Step : Single;
@@ -26391,7 +26575,7 @@ begin
   end;
 end;
 
-procedure TLuEntity.Thrust(aSpeed: Single);
+procedure TLuEntity.Thrust(const aSpeed: Single);
 var
   A, S: Single;
 begin
@@ -26404,7 +26588,7 @@ begin
   FPos.y := FPos.y + FDir.y;
 end;
 
-procedure TLuEntity.ThrustAngle(aAngle: Single; aSpeed: Single);
+procedure TLuEntity.ThrustAngle(const aAngle, aSpeed: Single);
 var
   A, S: Single;
 begin
@@ -26421,23 +26605,27 @@ begin
   FPos.y := FPos.y + FDir.y;
 end;
 
-function  TLuEntity.ThrustToPos(aThrustSpeed: Single; aRotSpeed: Single; aDestX: Single; aDestY: Single; aSlowdownDist: Single; aStopDist: Single; aStopSpeed: Single; aStopSpeedEpsilon: Single; aDeltaTime: Single): Boolean;
+function  TLuEntity.ThrustToPos(const aThrustSpeed, aRotSpeed, aDestX,
+  aDestY, aSlowdownDist, aStopDist, aStopSpeed, aStopSpeedEpsilon: Single;
+  const aDeltaTime: Double): Boolean;
 var
   Dist : Single;
   Step : Single;
   Speed: Single;
   DestPos: TLuVector;
+  LStopDist: Single;
 begin
   Result := False;
 
   if aSlowdownDist <= 0 then Exit;
-  if aStopDist < 0 then aStopDist := 0;
+  LStopDist := aStopDist;
+  if LStopDist < 0 then LStopDist := 0;
 
   DestPos.X := aDestX;
   DestPos.Y := aDestY;
   Dist := FPos.Distance(DestPos);
 
-  Dist := Dist - aStopDist;
+  Dist := Dist - LStopDist;
 
   if  Dist > aSlowdownDist then
     begin
@@ -26447,7 +26635,7 @@ begin
     begin
       Step := (Dist/aSlowdownDist);
       Speed := (aThrustSpeed * Step);
-      if Game.SameValuef(Speed, aStopSpeed, aStopSpeedEpsilon) then
+      if Game.SameValuef(Speed, LStopDist, aStopSpeedEpsilon) then
       begin
         Speed := 0;
         Result := True;
@@ -26461,7 +26649,7 @@ begin
 
 end;
 
-function  TLuEntity.Visible(aVirtualX: Single; aVirtualY: Single): Boolean;
+function  TLuEntity.Visible(const aVirtualX, aVirtualY: Single): Boolean;
 var
   HW,HH: Single;
   vp: TLuRect;
@@ -26488,7 +26676,7 @@ begin
   Result := True;
 end;
 
-function  TLuEntity.FullyVisible(aVirtualX: Single; aVirtualY: Single): Boolean;
+function  TLuEntity.FullyVisible(const aVirtualX, aVirtualY: Single): Boolean;
 var
   HW,HH: Single;
   vp: TLuRect;
@@ -26515,7 +26703,8 @@ begin
   Result := True;
 end;
 
-function  TLuEntity.Overlap(aX: Single; aY: Single; aRadius: Single; aShrinkFactor: Single): Boolean;
+function  TLuEntity.Overlap(const aX, aY, aRadius,
+  aShrinkFactor: Single): Boolean;
 var
   Dist: Single;
   R1  : Single;
@@ -26539,7 +26728,7 @@ begin
    Result := False;
 end;
 
-function  TLuEntity.Overlap(aEntity: TLuEntity): Boolean;
+function  TLuEntity.Overlap(const aEntity: TLuEntity): Boolean;
 begin
   with aEntity do
   begin
@@ -26547,35 +26736,41 @@ begin
   end;
 end;
 
-procedure TLuEntity.Render(aVirtualX: Single; aVirtualY: Single);
+procedure TLuEntity.Render(const aVirtualX, aVirtualY: Single);
 var
   X,Y: Integer;
 begin
   X := Round(FPos.X - aVirtualX);
   Y := Round(FPos.Y - aVirtualY);
-  FSprite.RenderImage(FFrame, FGroup, X, Y, FScale, FAngle, FFlipMode, @FOrigin, FColor, FBlendMode, FRenderPolyPoint);
+  FSprite.RenderImage(FFrame, FGroup, X, Y, FScale, FAngle, FFlipMode,
+  @FOrigin, FColor, FBlendMode, FRenderPolyPoint);
 end;
 
-procedure TLuEntity.RenderAt(aX: Single; aY: Single);
+procedure TLuEntity.RenderAt(const aX, aY: Single);
 begin
-  FSprite.RenderImage(FFrame, FGroup, Round(aX), Round(aY), FScale, FAngle, FFlipMode, @FOrigin, FColor,  FBlendMode, FRenderPolyPoint);
+  FSprite.RenderImage(FFrame, FGroup, aX, aY, FScale, FAngle, FFlipMode,
+    @FOrigin, FColor,  FBlendMode, FRenderPolyPoint);
 end;
 
-procedure TLuEntity.TracePolyPoint(aMju: Single=6; aMaxStepBack: Integer=12; aAlphaThreshold: Integer=70; aOrigin: PLuVector=nil);
+procedure TLuEntity.TracePolyPoint(const aMju: Single=6;
+  const aMaxStepBack: Integer=12; const aAlphaThreshold: Integer=70;
+  const aOrigin: PLuVector=nil);
 begin
-  FSprite.GroupPolyPointTrace(FGroup, aMju, aMaxStepBack, aAlphaThreshold, aOrigin);
+  FSprite.GroupPolyPointTrace(FGroup, aMju, aMaxStepBack, aAlphaThreshold,
+  aOrigin);
 end;
 
-function  TLuEntity.CollidePolyPoint(aEntity: TLuEntity; var aHitPos: TLuVector): Boolean;
+function  TLuEntity.CollidePolyPoint(const aEntity: TLuEntity;
+  var aHitPos: TLuVector): Boolean;
 var
   ShrinkFactor: Single;
 begin
   ShrinkFactor := (FShrinkFactor + aEntity.ShrinkFactor) / 2.0;
 
   Result := FSprite.GroupPolyPointCollide(
-    FFrame, FGroup, Round(FPos.X), Round(FPos.Y), FScale, FAngle, FFlipMode, @FOrigin,
-    aEntity.FSprite, aEntity.FFrame, aEntity.FGroup, Round(aEntity.FPos.X),
-    Round(aEntity.FPos.Y), aEntity.FScale, aEntity.FAngle, aEntity.FFlipMode,
+    FFrame, FGroup, FPos.X, FPos.Y, FScale, FAngle, FFlipMode,
+    @FOrigin, aEntity.FSprite, aEntity.FFrame, aEntity.FGroup, aEntity.FPos.X,
+    aEntity.FPos.Y, aEntity.FScale, aEntity.FAngle, aEntity.FFlipMode,
     @aEntity.FOrigin, ShrinkFactor, aHitPos);
 end;
 
@@ -26585,9 +26780,8 @@ var
 begin
   ShrinkFactor := FShrinkFactor;
 
-  Result := FSprite.GroupPolyPointCollidePoint(
-    FFrame, FGroup, Round(FPos.X), Round(FPos.Y), FScale, FAngle, FFlipMode, @FOrigin,
-    ShrinkFactor, aPoint);
+  Result := FSprite.GroupPolyPointCollidePoint( FFrame, FGroup, FPos.X, FPos.Y,
+  FScale, FAngle, FFlipMode, @FOrigin, ShrinkFactor, aPoint);
 end;
 
 function  TLuEntity.Sprite: TLuSprite;
@@ -26605,7 +26799,7 @@ begin
   Result := FFrame;
 end;
 
-procedure TLuEntity.SetFrame(aFrame: Integer);
+procedure TLuEntity.SetFrame(const aFrame: Integer);
 var
   W,H,R: Single;
 begin
@@ -26629,7 +26823,7 @@ begin
   Result := FFrameFPS;
 end;
 
-procedure TLuEntity.SetFrameFPS(aFrameFPS: Single);
+procedure TLuEntity.SetFrameFPS(const aFrameFPS: Single);
 begin
   FFrameFPS := aFrameFPS;
 end;
@@ -26674,17 +26868,17 @@ begin
  Result := FColor;
 end;
 
-procedure TLuEntity.SetColor(aColor: TLuColor);
+procedure TLuEntity.SetColor(const aColor: TLuColor);
 begin
   FColor := aColor;
 end;
 
-function  TLuEntity.FlipMode: Integer;
+function  TLuEntity.FlipMode: TLuFlipMode;
 begin
   Result := FFlipMode;
 end;
 
-procedure TLuEntity.SetFlipMode(aFlipMode: Integer);
+procedure TLuEntity.SetFlipMode(const aFlipMode: TLuFlipMode);
 begin
   FFlipMode := aFlipMode;
 end;
@@ -26694,7 +26888,7 @@ begin
   Result := FLoopFrame;
 end;
 
-procedure TLuEntity.SetLoopFrame(aLoop: Boolean);
+procedure TLuEntity.SetLoopFrame(const aLoop: Boolean);
 begin
   FLoopFrame := aLoop;
 end;
@@ -26719,12 +26913,12 @@ begin
   Result := FShrinkFactor;
 end;
 
-procedure TLuEntity.SetShrinkFactor(aShrinkFactor: Single);
+procedure TLuEntity.SetShrinkFactor(const aShrinkFactor: Single);
 begin
   FShrinkFactor := aShrinkFactor;
 end;
 
-procedure TLuEntity.SetRenderPolyPoint(aValue: Boolean);
+procedure TLuEntity.SetRenderPolyPoint(const aValue: Boolean);
 begin
   FRenderPolyPoint := aValue;
 end;
@@ -26795,25 +26989,29 @@ begin
   Result := True;
 end;
 
-procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; const aValue: string);
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string;
+  const aValue: string);
 begin
   if not Opened then Exit;
   FHandle.WriteString(aSection, aKey, aValue);
 end;
 
-procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; aValue: Integer);
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string;
+  aValue: Integer);
 begin
   if not Opened then Exit;
   SetValue(aSection, aKey, aValue.ToString);
 end;
 
-procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; aValue: Boolean);
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string;
+  aValue: Boolean);
 begin
   if not Opened then Exit;
   SetValue(aSection, aKey, aValue.ToInteger);
 end;
 
-procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal);
+procedure TLuConfigFile.SetValue(const aSection: string; const aKey: string;
+  aValue: Pointer; aValueSize: Cardinal);
 var
   LValue: TMemoryStream;
 begin
@@ -26830,14 +27028,16 @@ begin
   end;
 end;
 
-function  TLuConfigFile.GetValue(const aSection: string; const aKey: string; const aDefaultValue: string): string;
+function  TLuConfigFile.GetValue(const aSection: string; const aKey: string;
+  const aDefaultValue: string): string;
 begin
   Result := '';
   if not Opened then Exit;
   Result := FHandle.ReadString(aSection, aKey, aDefaultValue);
 end;
 
-function  TLuConfigFile.GetValue(const aSection: string; const aKey: string; aDefaultValue: Integer): Integer;
+function  TLuConfigFile.GetValue(const aSection: string; const aKey: string;
+  aDefaultValue: Integer): Integer;
 var
   LResult: string;
 begin
@@ -26847,14 +27047,16 @@ begin
   Integer.TryParse(LResult, Result);
 end;
 
-function  TLuConfigFile.GetValue(const aSection: string; const aKey: string; aDefaultValue: Boolean): Boolean;
+function  TLuConfigFile.GetValue(const aSection: string; const aKey: string;
+  aDefaultValue: Boolean): Boolean;
 begin
   Result := aDefaultValue;
   if not Opened then Exit;
   Result := GetValue(aSection, aKey, aDefaultValue.ToInteger).ToBoolean;
 end;
 
-procedure TLuConfigFile.GetValue(const aSection: string; const aKey: string; aValue: Pointer; aValueSize: Cardinal);
+procedure TLuConfigFile.GetValue(const aSection: string; const aKey: string;
+  aValue: Pointer; aValueSize: Cardinal);
 var
   LValue: TMemoryStream;
   LSize: Cardinal;
@@ -26876,7 +27078,8 @@ begin
   end;
 end;
 
-function  TLuConfigFile.RemoveKey(const aSection: string; const aKey: string): Boolean;
+function  TLuConfigFile.RemoveKey(const aSection: string;
+  const aKey: string): Boolean;
 var
   LSection: string;
   LKey: string;
@@ -26904,7 +27107,8 @@ begin
   Result := FSection.Count;
 end;
 
-function  TLuConfigFile.GetSectionValue(aIndex: Integer; aDefaultValue: string): string;
+function  TLuConfigFile.GetSectionValue(aIndex: Integer;
+  aDefaultValue: string): string;
 begin
   Result := '';
   if not Opened then Exit;
@@ -26913,14 +27117,16 @@ begin
   if Result = '' then Result := aDefaultValue;
 end;
 
-function  TLuConfigFile.GetSectionValue(aIndex: Integer; aDefaultValue: Integer): Integer;
+function  TLuConfigFile.GetSectionValue(const aIndex: Integer;
+  aDefaultValue: Integer): Integer;
 begin
   Result := aDefaultValue;
   if not Opened then Exit;
   Result := string(GetSectionValue(aIndex, aDefaultValue.ToString)).ToInteger;
 end;
 
-function  TLuConfigFile.GetSectionValue(aIndex: Integer; aDefaultValue: Boolean): Boolean;
+function  TLuConfigFile.GetSectionValue(const aIndex: Integer;
+  aDefaultValue: Boolean): Boolean;
 begin
   Result := aDefaultValue;
   if not Opened then Exit;
@@ -26930,7 +27136,8 @@ end;
 {$ENDREGION}
 
 {$REGION 'Luna.Starfield'}
-procedure TLuStarfield.TransformDrawPoint(const aX, aY, aZ: Single; aVPX, aVPY, aVPW, aVPH: Integer);
+procedure TLuStarfield.TransformDrawPoint(const aX, aY, aZ: Single; aVPX, aVPY,
+  aVPW, aVPH: Integer);
 var
   LX, LY: Single;
   LSize: Single;
@@ -26983,7 +27190,8 @@ begin
   inherited;
 end;
 
-procedure TLuStarfield.Init(const aStarCount: Cardinal; const aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ, aViewScale: Single);
+procedure TLuStarfield.Init(const aStarCount: Cardinal; const aMinX, aMinY,
+  aMinZ, aMaxX, aMaxY, aMaxZ, aViewScale: Single);
 var
   LVPX, LVPY: Integer;
   LVPW, LVPH: Integer;
@@ -27130,7 +27338,8 @@ begin
   LVPH := Round(LSize.Height);
   for LI := 0 to FStarCount - 1 do
   begin
-    TransformDrawPoint(FStar[LI].X, FStar[LI].Y, FStar[LI].Z, LVPX, LVPY, LVPW, LVPH);
+    TransformDrawPoint(FStar[LI].X, FStar[LI].Y, FStar[LI].Z, LVPX, LVPY, LVPW,
+      LVPH);
   end;
 end;
 
@@ -27187,7 +27396,8 @@ begin
     on E: Exception do
     begin
       LMsg := Format('%s: %s', [E.ClassName, E.Message]);
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, 'Fatal Error', LMarshaller.AsUtf8(LMsg).ToPointer, nil);
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, 'Fatal Error',
+        LMarshaller.AsUtf8(LMsg).ToPointer, nil);
     end;
   end;
 
@@ -27223,7 +27433,8 @@ end;
 
 function TLuGame.GetVersion: string;
 begin
-  Result := Format('%s.%s.%s', [cLuVersionMajor, cLuVersionMinor, cLuVersionPatch]);
+  Result := Format('%s.%s.%s', [cLuVersionMajor, cLuVersionMinor,
+    cLuVersionPatch]);
 end;
 
 function  TLuGame.GetTerminate: Boolean;
@@ -27285,7 +27496,8 @@ begin
   end;
   Log('Initialized truetype support...', []);
 
-  Mix_Init(MIX_INIT_FLAC or MIX_INIT_MP3 or MIX_INIT_OGG or MIX_INIT_OPUS or MIX_INIT_MID);
+  Mix_Init(MIX_INIT_FLAC or MIX_INIT_MP3 or MIX_INIT_OGG or MIX_INIT_OPUS or
+    MIX_INIT_MID);
   LMsg := string(SDL_GetError);
   if not LMsg.IsEmpty then
     Log('Warning: %s', [LMsg])
@@ -27473,14 +27685,14 @@ begin
   Settings.WindowClearColor := cLuDARKSLATEBROWN;
 
   Settings.DefaultFontSize := 8;
-  Settings.DefaultFontStyle := cLuFONTSTYLE_NORMAL;
+  Settings.DefaultFontStyle := fsNormal;
 
   Settings.HudTextItemPadWidth := 10;
   Settings.HudPosX := 3;
   Settings.HudPosY := 3;
   Settings.HudLineSpace := 0;
 
-  Settings.AllocateSoundChannels := LuAUDIO_CHANNEL_MAX;
+  Settings.AllocateSoundChannels := cLuAudioChannelMax;
   Settings.ReserveSoundChannels := 1;
 end;
 
@@ -27522,8 +27734,8 @@ end;
 procedure TLuGame.OnRenderHud;
 begin
   ResetHudPos;
-  HudText(FDefaultFont, cLuWHITE, cLuHALIGN_LEFT  , 'fps %d', [GetFrameRate]);
-  HudText(FDefaultFont, cLuGREEN, cLuHALIGN_LEFT, HudTextItem('ESC', 'Quit'), []);
+  HudText(FDefaultFont, cLuWHITE, haLeft  , 'fps %d', [GetFrameRate]);
+  HudText(FDefaultFont, cLuGREEN, haLeft, HudTextItem('ESC', 'Quit'), []);
 end;
 
 procedure TLuGame.OnShowWindow;
@@ -27535,13 +27747,15 @@ procedure TLuGame.OnSpeechWord(const aWord, aText: string);
 begin
 end;
 
-procedure TLuGame.OnArchiveBuildProgress(const aFilename: string; const aProgress: Integer; const aNewFile: Boolean);
+procedure TLuGame.OnArchiveBuildProgress(const aFilename: string;
+  const aProgress: Integer; const aNewFile: Boolean);
 begin
   if aNewFile then PrintLn;
   Print(cLuCR+'Adding "%s" (%d%s)...', [aFilename, Round(aProgress), '%']);
 end;
 
-procedure TLuGame.OnVideoStatus(const aStatus: Cardinal; const aFilename: string);
+procedure TLuGame.OnVideoStatus(const aStatus: TLuVideoStatus;
+  const aFilename: string);
 begin
 end;
 
@@ -27586,7 +27800,8 @@ begin
   SetConsoleMode(LStdIn, 0);
   repeat
     ReadConsoleInput(LStdIn, LInputRec, 1, LNumRead);
-  until (LInputRec.EventType and KEY_EVENT <> 0) and LInputRec.Event.KeyEvent.bKeyDown;
+  until (LInputRec.EventType and KEY_EVENT <> 0) and
+    LInputRec.Event.KeyEvent.bKeyDown;
   SetConsoleMode(LStdIn, LOldMode);
 end;
 
@@ -27637,7 +27852,8 @@ begin
   ShellExecute(0, 'OPEN', PChar(aFilename), '', '', SW_SHOWNORMAL);
 end;
 
-function  TLuGame.GetVersionInfo(const aInstance: THandle; const aIdent: string): string;
+function  TLuGame.GetVersionInfo(const aInstance: THandle;
+  const aIdent: string): string;
 type
   TLang = packed record
     Lng, Page: WORD;
@@ -27666,7 +27882,8 @@ begin
       FreeNilObject(RS);
     end;
 
-    if not VerQueryValue(RM.Memory, '\\VarFileInfo\\Translation', Pointer(BLngs), BL) then
+    if not VerQueryValue(RM.Memory, '\\VarFileInfo\\Translation',
+      Pointer(BLngs), BL) then
       Exit; // Failed to parse the translations table
     BLngsCnt := BL div sizeof(TLang);
     if BLngsCnt <= 0 then
@@ -27685,7 +27902,8 @@ begin
   end;
 end;
 
-function  TLuGame.GetVersionInfo(const aFilename: string; const aIdent: string): string;
+function  TLuGame.GetVersionInfo(const aFilename: string;
+  const aIdent: string): string;
 begin
   Result := GetVersionInfo(GetModuleHandle(PChar(aFilename)), aIdent);
 end;
@@ -27738,7 +27956,8 @@ begin
   end;
 end;
 
-function TLuGame.GetArcFilename(const aFilename: string; const aPassword: string=''): string;
+function TLuGame.GetArcFilename(const aFilename: string;
+  const aPassword: string=''): string;
 begin
   if aPassword.IsEmpty then
     Result := aFilename
@@ -27746,21 +27965,25 @@ begin
     Result := aFilename + '$' + aPassword;
 end;
 
-function TLuGame.GetArchiveRWops(const aFilename: string; const aPassword: string): PSDL_RWops;
+function TLuGame.GetArchiveRWops(const aFilename: string;
+  const aPassword: string): PSDL_RWops;
 begin
-  Result := PHYSFSRWOPS_openRead(PAnsiChar(AnsiString(GetArcFilename(aFilename, aPassword))));
+  Result := PHYSFSRWOPS_openRead(PAnsiChar(AnsiString(GetArcFilename(aFilename,
+    aPassword))));
 end;
 
 function TLuGame.GetFileRWops(const aFilename: string): PSDL_RWops;
 begin
   Result := SDL_RWFromFile(PAnsiChar(AnsiString(aFilename)), 'rb');
 end;
-function TLuGame.GetMemRWops(const aMem: Pointer; const aSize: Integer): PSDL_RWops;
+function TLuGame.GetMemRWops(const aMem: Pointer;
+  const aSize: Integer): PSDL_RWops;
 begin
   Result := SDL_RWFromConstMem(aMem, aSize);
 end;
 
-function  TLuGame.BuildArchive(const aPassword, aFilename, aDirectory: string): Boolean;
+function  TLuGame.BuildArchive(const aPassword, aFilename,
+  aDirectory: string): Boolean;
 var
   LArchive: TLuArchive;
 begin
@@ -27772,12 +27995,14 @@ begin
   end;
 end;
 
-function TLuGame.ResourceExists(aInstance: THandle; const aResName: string): Boolean;
+function TLuGame.ResourceExists(aInstance: THandle;
+  const aResName: string): Boolean;
 begin
   Result := Boolean((FindResource(aInstance, PChar(aResName), RT_RCDATA) <> 0));
 end;
 
-class function  TLuGame.IsSingleInstance(aMutexName: string; aKeepMutex: Boolean=True): Boolean;
+class function  TLuGame.IsSingleInstance(aMutexName: string;
+  aKeepMutex: Boolean=True): Boolean;
 const
   MUTEX_GLOBAL = 'Global\'; // Prefix to explicitly create the object in the
 var
@@ -27792,7 +28017,8 @@ begin
   LSecurityAttr.lpSecurityDescriptor := @LSecurityDesc;
   LSecurityAttr.bInheritHandle:=False;
 
-  LMutexHandel := CreateMutex(@LSecurityAttr, True, PChar(MUTEX_GLOBAL + aMutexName));
+  LMutexHandel := CreateMutex(@LSecurityAttr, True,
+    PChar(MUTEX_GLOBAL + aMutexName));
   LErrCode := GetLastError;
 
   if {(MutexHandel = 0) or }(LErrCode = ERROR_ALREADY_EXISTS) then
@@ -27851,7 +28077,8 @@ end;
 
 function  TLuGame.GetPrefsPath: string;
 begin
-  Result := string(SDL_GetPrefPath(FMarshaller.AsUtf8(FOrgName).ToPointer, FMarshaller.AsUtf8(FAppName).ToPointer));
+  Result := string(SDL_GetPrefPath(FMarshaller.AsUtf8(FOrgName).ToPointer,
+    FMarshaller.AsUtf8(FAppName).ToPointer));
 end;
 
 procedure TLuGame.GotoPrefsPath;
@@ -27942,7 +28169,8 @@ begin
   System.RandSeed := aVaLue;
 end;
 
-function  TLuGame.ClipVaLuef(var aVaLue: Single; const aMin, aMax: Single; const aWrap: Boolean): Single;
+function  TLuGame.ClipVaLuef(var aVaLue: Single; const aMin, aMax: Single;
+  const aWrap: Boolean): Single;
 begin
   if aWrap then
     begin
@@ -27970,7 +28198,8 @@ begin
   Result := aVaLue;
 end;
 
-function  TLuGame.ClipVaLue(var aVaLue: Integer; const aMin, aMax: Integer; const aWrap: Boolean): Integer;
+function  TLuGame.ClipVaLue(var aVaLue: Integer; const aMin, aMax: Integer;
+  const aWrap: Boolean): Integer;
 begin
   if aWrap then
     begin
@@ -28014,12 +28243,14 @@ begin
     Result := False;
 end;
 
-function  TLuGame.SameVaLue(const aA, aB: Double; const aEpsilon: Double = 0): Boolean;
+function  TLuGame.SameVaLue(const aA, aB: Double;
+  const aEpsilon: Double = 0): Boolean;
 begin
   Result := System.Math.SameVaLue(aA, aB, aEpsilon);
 end;
 
-function  TLuGame.SameVaLuef(const aA, aB: Single; const aEpsilon: Single = 0): Boolean;
+function  TLuGame.SameVaLuef(const aA, aB: Single;
+  const aEpsilon: Single = 0): Boolean;
 begin
   Result := System.Math.SameVaLue(aA, aB, aEpsilon);
 end;
@@ -28029,7 +28260,7 @@ function  TLuGame.AngleDiff(const aSrcAngle, aDestAngle: Single): Single;
 var
   C: Single;
 begin
-  C := aDestAngle - aSrcAngle - (Floor((aDestAngle - aSrcAngle) / 360.0) * 360.0);
+  C := aDestAngle-aSrcAngle-(Floor((aDestAngle-aSrcAngle)/360.0)*360.0);
 
   if C >= (360.0 / 2) then
   begin
@@ -28038,7 +28269,8 @@ begin
   Result := C;
 end;
 
-procedure TLuGame.AngleRotatePos(const aAngle: Single; var aX: Single; var aY: Single);
+procedure TLuGame.AngleRotatePos(const aAngle: Single; var aX: Single;
+  var aY: Single);
 var
   nx,ny: Single;
   ia: Integer;
@@ -28055,7 +28287,8 @@ begin
   ay := ny;
 end;
 
-procedure TLuGame.SmoothMove(var aVaLue: Single; const aAmount, aMax, aDrag: Single);
+procedure TLuGame.SmoothMove(var aVaLue: Single; const aAmount, aMax,
+  aDrag: Single);
 var
   LAmt: Single;
 begin
@@ -28105,7 +28338,8 @@ begin
   FTimer.Update;
 end;
 
-procedure TLuGame.ResetTiming(const aSpeed: Single=0; const aFixedSpeed: Single=0);
+procedure TLuGame.ResetTiming(const aSpeed: Single=0;
+  const aFixedSpeed: Single=0);
 begin
   FTimer.Reset(aSpeed, aFixedSpeed);
 end;
@@ -28145,12 +28379,14 @@ begin
   Result := FTimer.FrameSpeed(aTimer, aSpeed);
 end;
 
-function  TLuGame.FrameElapsed(var aTimer: Single; const aFrames: Single): Boolean;
+function  TLuGame.FrameElapsed(var aTimer: Single;
+  const aFrames: Single): Boolean;
 begin
   Result := FTimer.FrameElapsed(aTimer, aFrames);
 end;
 
-function  TLuGame.PointInRectangle(const aPoint: TLuVector; const aRect: TLuRect): Boolean;
+function  TLuGame.PointInRectangle(const aPoint: TLuVector;
+  const aRect: TLuRect): Boolean;
 begin
   if ((aPoint.X >= aRect.X) and (aPoint.X <= (aRect.X + aRect.Width)) and
     (aPoint.Y >= aRect.Y) and (aPoint.Y <= (aRect.Y + aRect.Height))) then
@@ -28159,12 +28395,14 @@ begin
     Result := False;
 end;
 
-function  TLuGame.PointInCircle(const aPoint, aCenter: TLuVector; const aRadius: Single): Boolean;
+function  TLuGame.PointInCircle(const aPoint, aCenter: TLuVector;
+  const aRadius: Single): Boolean;
 begin
   Result := CirclesOverlap(aPoint, 0, aCenter, aRadius);
 end;
 
-function  TLuGame.PointInTriangle(const aPoint, aP1, aP2, aP3: TLuVector): Boolean;
+function  TLuGame.PointInTriangle(const aPoint, aP1, aP2,
+  aP3: TLuVector): Boolean;
 var
   LAlpha, LBeta, LGamma: Single;
 begin
@@ -28184,7 +28422,9 @@ begin
     Result := False;
 end;
 
-function  TLuGame.CirclesOverlap(const aCenter1: TLuVector; const aRadius1: Single; const aCenter2: TLuVector; const aRadius2: Single): Boolean;
+function  TLuGame.CirclesOverlap(const aCenter1: TLuVector;
+  const aRadius1: Single; const aCenter2: TLuVector;
+  const aRadius2: Single): Boolean;
 var
   LDX, LDY, LDistance: Single;
 begin
@@ -28199,7 +28439,8 @@ begin
     Result := False;
 end;
 
-function  TLuGame.CircleInRectangle(const aCenter: TLuVector; const aRadius: Single; const aRect: TLuRect): Boolean;
+function  TLuGame.CircleInRectangle(const aCenter: TLuVector;
+  const aRadius: Single; const aRect: TLuRect): Boolean;
 var
   LDX, LDY: Single;
   LCornerDistanceSq: Single;
@@ -28241,7 +28482,8 @@ begin
   Result := Boolean(LCornerDistanceSq <= (aRadius * aRadius));
 end;
 
-function  TLuGame.RectanglesOverlap(const aRect1: TLuRect; const aRect2: TLuRect): Boolean;
+function  TLuGame.RectanglesOverlap(const aRect1: TLuRect;
+  const aRect2: TLuRect): Boolean;
 var
   LDX, LDY: Single;
 begin
@@ -28325,7 +28567,8 @@ begin
   end;
 end;
 
-function  TLuGame.LineIntersection(const aX1, aY1, aX2, aY2, aX3, aY3, aX4, aY4: Integer; var aX, aY: Integer): TLuLineIntersection;
+function  TLuGame.LineIntersection(const aX1, aY1, aX2, aY2, aX3, aY3, aX4,
+  aY4: Integer; var aX, aY: Integer): TLuLineIntersection;
 var
   LAX, LBX, LCX, LAY, LBY, LCY, LD, LE, LF, LNum: Integer;
   LOffset: Integer;
@@ -28437,7 +28680,8 @@ begin
   Result := liTrue;
 end;
 
-function  TLuGame.RadiusOverlap(const aRadius1, aX1, aY1, aRadius2, aX2, aY2, aShrinkFactor: Single): Boolean;
+function  TLuGame.RadiusOverlap(const aRadius1, aX1, aY1, aRadius2, aX2, aY2,
+  aShrinkFactor: Single): Boolean;
 var
   LDist: Single;
   LR1, LR2: Single;
@@ -28459,7 +28703,8 @@ begin
     Result := False;
 end;
 
-function  TLuGame.EaseVaLue(const aCurrentTime, aStartVaLue, aChangeInVaLue, aDuration: Double; const aEaseType: TLuEaseType): Double;
+function  TLuGame.EaseVaLue(const aCurrentTime, aStartVaLue, aChangeInVaLue,
+  aDuration: Double; const aEaseType: TLuEaseType): Double;
 var
   LCurrentTime: Double;
 begin
@@ -28480,157 +28725,183 @@ begin
     etOutQuad:
       begin
         LCurrentTime := LCurrentTime / aDuration;
-        Result := -aChangeInVaLue * LCurrentTime * (LCurrentTime-2) + aStartVaLue;
+        Result := -aChangeInVaLue*LCurrentTime*(LCurrentTime-2)+aStartVaLue;
       end;
 
     etInOutQuad:
       begin
         LCurrentTime := LCurrentTime / (aDuration / 2);
         if LCurrentTime < 1 then
-          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime + aStartVaLue
+          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime +
+            aStartVaLue
         else
         begin
           LCurrentTime := LCurrentTime - 1;
-          Result := -aChangeInVaLue / 2 * (LCurrentTime * (LCurrentTime - 2) - 1) + aStartVaLue;
+          Result := -aChangeInVaLue / 2 * (LCurrentTime * (LCurrentTime - 2)
+             - 1) + aStartVaLue;
         end;
       end;
 
     etInCubic:
       begin
         LCurrentTime := LCurrentTime / aDuration;
-        Result := aChangeInVaLue * LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue;
+        Result := aChangeInVaLue * LCurrentTime * LCurrentTime *
+          LCurrentTime + aStartVaLue;
       end;
 
     etOutCubic:
       begin
         LCurrentTime := (LCurrentTime / aDuration) - 1;
-        Result := aChangeInVaLue * ( LCurrentTime * LCurrentTime * LCurrentTime + 1) + aStartVaLue;
+        Result := aChangeInVaLue * ( LCurrentTime * LCurrentTime *
+          LCurrentTime + 1) + aStartVaLue;
       end;
 
     etInOutCubic:
       begin
         LCurrentTime := LCurrentTime / (aDuration/2);
         if LCurrentTime < 1 then
-          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue
+          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime *
+            LCurrentTime + aStartVaLue
         else
         begin
           LCurrentTime := LCurrentTime - 2;
-          Result := aChangeInVaLue / 2 * (LCurrentTime * LCurrentTime * LCurrentTime + 2) + aStartVaLue;
+          Result := aChangeInVaLue / 2 * (LCurrentTime * LCurrentTime *
+            LCurrentTime + 2) + aStartVaLue;
         end;
       end;
 
     etInQuart:
       begin
         LCurrentTime := LCurrentTime / aDuration;
-        Result := aChangeInVaLue * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue;
+        Result := aChangeInVaLue * LCurrentTime * LCurrentTime * LCurrentTime *
+          LCurrentTime + aStartVaLue;
       end;
 
     etOutQuart:
       begin
         LCurrentTime := (LCurrentTime / aDuration) - 1;
-        Result := -aChangeInVaLue * (LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime - 1) + aStartVaLue;
+        Result := -aChangeInVaLue * (LCurrentTime * LCurrentTime * LCurrentTime
+          * LCurrentTime - 1) + aStartVaLue;
       end;
 
     etInOutQuart:
       begin
         LCurrentTime := LCurrentTime / (aDuration / 2);
         if LCurrentTime < 1 then
-          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue
+          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime *
+            LCurrentTime * LCurrentTime + aStartVaLue
         else
         begin
           LCurrentTime := LCurrentTime - 2;
-          Result := -aChangeInVaLue / 2 * (LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime - 2) + aStartVaLue;
+          Result := -aChangeInVaLue / 2 * (LCurrentTime * LCurrentTime *
+            LCurrentTime * LCurrentTime - 2) + aStartVaLue;
         end;
       end;
 
     etInQuint:
       begin
         LCurrentTime := LCurrentTime / aDuration;
-        Result := aChangeInVaLue * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue;
+        Result := aChangeInVaLue * LCurrentTime * LCurrentTime * LCurrentTime *
+          LCurrentTime * LCurrentTime + aStartVaLue;
       end;
 
     etOutQuint:
       begin
         LCurrentTime := (LCurrentTime / aDuration) - 1;
-        Result := aChangeInVaLue * (LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime + 1) + aStartVaLue;
+        Result := aChangeInVaLue * (LCurrentTime * LCurrentTime * LCurrentTime*
+          LCurrentTime * LCurrentTime + 1) + aStartVaLue;
       end;
 
     etInOutQuint:
       begin
         LCurrentTime := LCurrentTime / (aDuration / 2);
         if LCurrentTime < 1 then
-          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue
+          Result := aChangeInVaLue / 2 * LCurrentTime * LCurrentTime *
+            LCurrentTime * LCurrentTime * LCurrentTime + aStartVaLue
         else
         begin
           LCurrentTime := LCurrentTime - 2;
-          Result := aChangeInVaLue / 2 * (LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime * LCurrentTime + 2) + aStartVaLue;
+          Result := aChangeInVaLue / 2 * (LCurrentTime * LCurrentTime *
+            LCurrentTime * LCurrentTime * LCurrentTime + 2) + aStartVaLue;
         end;
       end;
 
     etInSine:
       begin
-        Result := -aChangeInVaLue * Cos(LCurrentTime / aDuration * (PI / 2)) + aChangeInVaLue + aStartVaLue;
+        Result := -aChangeInVaLue * Cos(LCurrentTime / aDuration * (PI / 2)) +
+          aChangeInVaLue + aStartVaLue;
       end;
 
     etOutSine:
       begin
-        Result := aChangeInVaLue * Sin(LCurrentTime / aDuration * (PI / 2)) + aStartVaLue;
+        Result := aChangeInVaLue * Sin(LCurrentTime / aDuration * (PI / 2)) +
+          aStartVaLue;
       end;
 
     etInOutSine:
       begin
-        Result := -aChangeInVaLue / 2 * (Cos(PI * LCurrentTime / aDuration) - 1) + aStartVaLue;
+        Result := -aChangeInVaLue/2 * (Cos(PI * LCurrentTime / aDuration)-1) +
+          aStartVaLue;
       end;
 
     etInExpo:
       begin
-        Result := aChangeInVaLue * Power(2, 10 * (LCurrentTime/aDuration - 1) ) + aStartVaLue;
+        Result := aChangeInVaLue * Power(2, 10 * (LCurrentTime/aDuration - 1))+
+          aStartVaLue;
       end;
 
     etOutExpo:
       begin
-        Result := aChangeInVaLue * (-Power(2, -10 * LCurrentTime / aDuration ) + 1 ) + aStartVaLue;
+        Result := aChangeInVaLue * (-Power(2, -10 * LCurrentTime / aDuration)+
+          1)+aStartVaLue;
       end;
 
     etInOutExpo:
       begin
         LCurrentTime := LCurrentTime / (aDuration/2);
         if LCurrentTime < 1 then
-          Result := aChangeInVaLue / 2 * Power(2, 10 * (LCurrentTime - 1) ) + aStartVaLue
+          Result := aChangeInVaLue / 2 * Power(2, 10 * (LCurrentTime - 1) ) +
+            aStartVaLue
         else
          begin
            LCurrentTime := LCurrentTime - 1;
-           Result := aChangeInVaLue / 2 * (-Power(2, -10 * LCurrentTime) + 2 ) + aStartVaLue;
+           Result := aChangeInVaLue / 2 * (-Power(2, -10 * LCurrentTime) + 2)+
+           aStartVaLue;
          end;
       end;
 
     etInCircle:
       begin
         LCurrentTime := LCurrentTime / aDuration;
-        Result := -aChangeInVaLue * (Sqrt(1 - LCurrentTime * LCurrentTime) - 1) + aStartVaLue;
+        Result := -aChangeInVaLue * (Sqrt(1 - LCurrentTime * LCurrentTime)-1) +
+          aStartVaLue;
       end;
 
     etOutCircle:
       begin
         LCurrentTime := (LCurrentTime / aDuration) - 1;
-        Result := aChangeInVaLue * Sqrt(1 - LCurrentTime * LCurrentTime) + aStartVaLue;
+        Result := aChangeInVaLue * Sqrt(1 - LCurrentTime * LCurrentTime) +
+          aStartVaLue;
       end;
 
     etInOutCircle:
       begin
         LCurrentTime := LCurrentTime / (aDuration / 2);
         if LCurrentTime < 1 then
-          Result := -aChangeInVaLue / 2 * (Sqrt(1 - LCurrentTime * LCurrentTime) - 1) + aStartVaLue
+          Result := -aChangeInVaLue / 2 * (Sqrt(1 - LCurrentTime*LCurrentTime)
+            - 1) + aStartVaLue
         else
         begin
           LCurrentTime := LCurrentTime - 2;
-          Result := aChangeInVaLue / 2 * (Sqrt(1 - LCurrentTime * LCurrentTime) + 1) + aStartVaLue;
+          Result := aChangeInVaLue / 2 * (Sqrt(1 - LCurrentTime*LCurrentTime) +
+            1) + aStartVaLue;
         end;
       end;
   end;
 end;
 
-function  TLuGame.EasePosition(const aStartPos, aEndPos, aCurrentPos: Double; const aEaseType: TLuEaseType): Double;
+function  TLuGame.EasePosition(const aStartPos, aEndPos, aCurrentPos: Double;
+  const aEaseType: TLuEaseType): Double;
 var
   LT, LB, LC, LD: Double;
 begin
@@ -28648,7 +28919,8 @@ begin
   Result := FSpeech.GetVoiceCount;
 end;
 
-function  TLuGame.GetSpeechVoiceAttribute(const aIndex: Integer; const aAttribute: TLuSpeechVoiceAttribute): string;
+function  TLuGame.GetSpeechVoiceAttribute(const aIndex: Integer;
+  const aAttribute: TLuSpeechVoiceAttribute): string;
 begin
   Result := FSpeech.GetVoiceAttribute(aIndex, aAttribute);
 end;
@@ -28718,7 +28990,8 @@ begin
   FSpeech.SubstituteWord(aWord, aSubstituteWord);
 end;
 
-function  TLuGame.OpenWindow(const aTitle: string; const aX, aY, aWidth, aHeight: Integer): Boolean;
+function  TLuGame.OpenWindow(const aTitle: string; const aX, aY, aWidth,
+  aHeight: Integer): Boolean;
 begin
   Result := FWindow.Open(aTitle, aX, aY, aWidth, aHeight);
 end;
@@ -28753,7 +29026,8 @@ begin
   Result := FWindow.GetRendererHandle;
 end;
 
-procedure TLuGame.GetWindowInfo(const aSize, aRenderSize, aScale: PLuVector; const aDDpi, aHDpi, aVDpi: System.PSingle);
+procedure TLuGame.GetWindowInfo(const aSize, aRenderSize, aScale: PLuVector;
+  const aDDpi, aHDpi, aVDpi: System.PSingle);
 begin
   FWindow.GetInfo(aSize, aRenderSize, aScale, aDDpi, aHDpi, aVDpi);
 end;
@@ -28803,17 +29077,20 @@ begin
   FWindow.DrawPoint(aX, aY, aColor);
 end;
 
-procedure TLuGame.DrawLine(const aX1, aY1, aX2, aY2: Single; const aColor: TLuColor);
+procedure TLuGame.DrawLine(const aX1, aY1, aX2, aY2: Single;
+  const aColor: TLuColor);
 begin
   FWindow.DrawLine(aX1, aY1, aX2, aY2, aColor);
 end;
 
-procedure TLuGame.DrawRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor);
+procedure TLuGame.DrawRect(const aX, aY, aWidth, aHeight: Single;
+  const aColor: TLuColor);
 begin
   FWindow.DrawRect(aX, aY, aWidth, aHeight, aColor);
 end;
 
-procedure TLuGame.DrawFilledRect(const aX, aY, aWidth, aHeight: Single; const aColor: TLuColor);
+procedure TLuGame.DrawFilledRect(const aX, aY, aWidth, aHeight: Single;
+  const aColor: TLuColor);
 begin
   FWindow.DrawFilledRect(aX, aY, aWidth, aHeight, aColor);
 end;
@@ -28883,7 +29160,8 @@ begin
   Result := FInput.ControllerPosition(aAxis);
 end;
 
-function  TLuGame.LoadMusic(const aArchive: TLuArchive; const aFilename: string): TLuMusic;
+function  TLuGame.LoadMusic(const aArchive: TLuArchive;
+  const aFilename: string): TLuMusic;
 begin
   if Assigned(aArchive) then
     Result := Mix_LoadMUS_RW(aArchive.GetRWops(string(aFilename)), SDL_True)
@@ -28891,7 +29169,9 @@ begin
     Result := Mix_LoadMUS_RW(GetFileRWops(string(aFilename)), SDL_True);
 end;
 
-function  TLuGame.LoadPlayMusic(const aArchive: TLuArchive; const aFilename: string; const aVolume: Single; const aLoop: Integer): TLuMusic;
+function  TLuGame.LoadPlayMusic(const aArchive: TLuArchive;
+  const aFilename: string; const aVolume: Single;
+  const aLoop: Integer): TLuMusic;
 begin
   if Assigned(aArchive) then
     Result := Mix_LoadMUS_RW(aArchive.GetRWops(string(aFilename)), SDL_True)
@@ -28910,7 +29190,8 @@ begin
   end;
 end;
 
-function  TLuGame.PlayMusic(const aMusic: TLuMusic; const aVolume: Single; const aLoop: Integer): Boolean;
+function  TLuGame.PlayMusic(const aMusic: TLuMusic; const aVolume: Single;
+  const aLoop: Integer): Boolean;
 begin
   Result := False;
   if not Assigned(aMusic) then Exit;
@@ -28935,7 +29216,8 @@ begin
 end;
 
 
-function  TLuGame.LoadSound(const aArchive: TLuArchive; const aFilename: string): TLuSound;
+function  TLuGame.LoadSound(const aArchive: TLuArchive;
+  const aFilename: string): TLuSound;
 begin
   if Assigned(aArchive) then
     Result := Mix_LoadWAV_RW(aArchive.GetRWops(string(aFilename)), SDL_True)
@@ -28956,7 +29238,7 @@ procedure TLuGame.AllocateSoundChannels(const aCount: Integer);
 var
   LCount: Integer;
 begin
-  LCount := EnsureRange(aCount, 1, LuAUDIO_CHANNEL_MAX);
+  LCount := EnsureRange(aCount, 1, cLuAudioChannelMax);
   Mix_AllocateChannels(LCount);
 end;
 
@@ -28968,19 +29250,23 @@ begin
   Mix_ReserveChannels(LCount);
 end;
 
-function  TLuGame.PlaySound(const aSound: TLuSound; const aChannel: Integer; const aVolume: Single; const aLoops: Integer): Integer;
+function  TLuGame.PlaySound(const aSound: TLuSound; const aChannel: Integer;
+  const aVolume: Single; const aLoops: Integer): Integer;
 begin
   Result := Mix_PlayChannel(aChannel, aSound, aLoops);
   SetSoundVolume(Result, aVolume);
 end;
 
-function  TLuGame.FadeInSound(const aSound: TLuSound; const aChannel: Integer; const aVolume: Single; const aLoops: Integer; const aMilliseconds: Integer): Integer;
+function  TLuGame.FadeInSound(const aSound: TLuSound; const aChannel: Integer;
+  const aVolume: Single; const aLoops: Integer;
+  const aMilliseconds: Integer): Integer;
 begin
   Result := Mix_FadeInChannel(aChannel, aSound, aLoops, aMilliseconds);
   SetSoundVolume(Result, aVolume);
 end;
 
-procedure TLuGame.FadeOutSound(const aChannel: Integer; const aMilliseconds: Integer);
+procedure TLuGame.FadeOutSound(const aChannel: Integer;
+  const aMilliseconds: Integer);
 begin
   Mix_FadeOutChannel(aChannel, aMilliseconds);
 end;
@@ -29034,12 +29320,14 @@ begin
     Result := False;
 end;
 
-procedure TLuGame.ExpireSound(const aChannel: Integer; const aMilliseconds: Integer);
+procedure TLuGame.ExpireSound(const aChannel: Integer;
+  const aMilliseconds: Integer);
 begin
   Mix_ExpireChannel(aChannel, aMilliseconds);
 end;
 
-function  TLuGame.SetSoundPosition(const aChannel: Integer; const aAngle: SmallInt; const aDistance: Byte): Boolean;
+function  TLuGame.SetSoundPosition(const aChannel: Integer;
+  const aAngle: SmallInt; const aDistance: Byte): Boolean;
 begin
   Result := Boolean(Mix_SetPosition(aChannel, aAngle, aDistance) <> 0);
 end;
@@ -29049,7 +29337,8 @@ begin
   Result := @FVideo;
 end;
 
-function  TLuGame.LoadVideo(const aArchive: TLuArchive; const aFilename: string): Boolean;
+function  TLuGame.LoadVideo(const aArchive: TLuArchive;
+  const aFilename: string): Boolean;
 begin
   Result := FVideo.Load(aArchive, aFilename);
 end;
@@ -29064,7 +29353,8 @@ begin
   FVideo.Play(aVolume, aLoop);
 end;
 
-function TLuGame.LoadPlayVideo(const aArchive: TLuArchive; const aFilename: string; const aVolume: Single; const aLoop: Integer): Boolean;
+function TLuGame.LoadPlayVideo(const aArchive: TLuArchive;
+  const aFilename: string; const aVolume: Single; const aLoop: Integer): Boolean;
 begin
   Result := FVideo.Load(aArchive, aFilename);
   if Result then
@@ -29086,7 +29376,7 @@ begin
   FVideo.Rewind;
 end;
 
-function  TLuGame.GetVideoStatus: Cardinal;
+function  TLuGame.GetVideoStatus: TLuVideoStatus;
 begin
   Result := FVideo.GetStatus;
 end;
@@ -29147,12 +29437,14 @@ begin
   FHud.TextItemPadWidth := aWidth;
 end;
 
-procedure TLuGame.HudText(const aFont: TLuFont; const aColor: TLuColor; const aHAlign: Cardinal; const aMsg: string; const aArgs: array of const);
+procedure TLuGame.HudText(const aFont: TLuFont; const aColor: TLuColor;
+  const aHAlign: TLuHAlign; const aMsg: string; const aArgs: array of const);
 begin
   aFont.DrawText(FHud.Pos.x, FHud.Pos.y, FHud.Pos.Z, aColor, aHAlign, aMsg, aArgs);
 end;
 
-function  TLuGame.HudTextItem(const aKey: string; const aValue: string; const aSeperator: string): string;
+function  TLuGame.HudTextItem(const aKey: string; const aValue: string;
+  const aSeperator: string): string;
 begin
   Result := Format('%s %s %s', [string(aKey).PadRight(FHud.TextItemPadWidth, ' '), aSeperator, aValue]);
 end;

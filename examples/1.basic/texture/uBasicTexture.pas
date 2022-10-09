@@ -132,7 +132,7 @@ begin
 
   // Render textured centered on display using native PNG transparency
   FTexture.Render(nil, Settings.WindowWidth/2, Settings.WindowHeight/2, 1, 0,
-    cLuFLIP_NONE, @FOrigin, cLuWhite, cLuBLENDMODE_ADD);
+    fmNone, @FOrigin, cLuWhite, bmAdd);
 end;
 
 end.

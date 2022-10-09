@@ -135,7 +135,7 @@ procedure TBasicTiledTexture.OnRender;
 begin
   inherited;
 
-  FTexture.RenderTiled(0, FPos.Y, cLuWhite, cLuBLENDMODE_NONE);
+  FTexture.RenderTiled(0, FPos.Y, cLuWhite, bmNone);
 end;
 
 end.
