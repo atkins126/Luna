@@ -1,30 +1,39 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{C5677112-6011-4A3B-9974-F8887EF208E4}</ProjectGuid>
+        <ProjectGuid>{95898D09-5D2C-4A64-9C22-19A68E3E1F99}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <Projects Include="LuArc.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\1.basic\music\BasicMusic.dproj">
+        <Projects Include="..\examples\elastic_demo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\1.basic\speech\BasicSpeech.dproj">
+        <Projects Include="..\examples\entity_collision.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\1.basic\texture\BasicTexture.dproj">
+        <Projects Include="..\examples\font_unicode.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj">
+        <Projects Include="..\examples\music_play.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\1.basic\video\BasicVideo.dproj">
+        <Projects Include="..\examples\speech_play.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\1.basic\Starfield\BasicStarfield.dproj">
+        <Projects Include="..\examples\starfield_render.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj">
+        <Projects Include="..\examples\texture_render.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\texture_tiled.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\video_chained_play.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\examples\video_play.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -44,77 +53,104 @@
     <Target Name="LuArc:Make">
         <MSBuild Projects="LuArc.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BasicMusic">
-        <MSBuild Projects="..\examples\1.basic\music\BasicMusic.dproj"/>
+    <Target Name="elastic_demo">
+        <MSBuild Projects="..\examples\elastic_demo.dproj"/>
     </Target>
-    <Target Name="BasicMusic:Clean">
-        <MSBuild Projects="..\examples\1.basic\music\BasicMusic.dproj" Targets="Clean"/>
+    <Target Name="elastic_demo:Clean">
+        <MSBuild Projects="..\examples\elastic_demo.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BasicMusic:Make">
-        <MSBuild Projects="..\examples\1.basic\music\BasicMusic.dproj" Targets="Make"/>
+    <Target Name="elastic_demo:Make">
+        <MSBuild Projects="..\examples\elastic_demo.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BasicSpeech">
-        <MSBuild Projects="..\examples\1.basic\speech\BasicSpeech.dproj"/>
+    <Target Name="entity_collision">
+        <MSBuild Projects="..\examples\entity_collision.dproj"/>
     </Target>
-    <Target Name="BasicSpeech:Clean">
-        <MSBuild Projects="..\examples\1.basic\speech\BasicSpeech.dproj" Targets="Clean"/>
+    <Target Name="entity_collision:Clean">
+        <MSBuild Projects="..\examples\entity_collision.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BasicSpeech:Make">
-        <MSBuild Projects="..\examples\1.basic\speech\BasicSpeech.dproj" Targets="Make"/>
+    <Target Name="entity_collision:Make">
+        <MSBuild Projects="..\examples\entity_collision.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BasicTexture">
-        <MSBuild Projects="..\examples\1.basic\texture\BasicTexture.dproj"/>
+    <Target Name="font_unicode">
+        <MSBuild Projects="..\examples\font_unicode.dproj"/>
     </Target>
-    <Target Name="BasicTexture:Clean">
-        <MSBuild Projects="..\examples\1.basic\texture\BasicTexture.dproj" Targets="Clean"/>
+    <Target Name="font_unicode:Clean">
+        <MSBuild Projects="..\examples\font_unicode.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BasicTexture:Make">
-        <MSBuild Projects="..\examples\1.basic\texture\BasicTexture.dproj" Targets="Make"/>
+    <Target Name="font_unicode:Make">
+        <MSBuild Projects="..\examples\font_unicode.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BasicTiledTexture">
-        <MSBuild Projects="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj"/>
+    <Target Name="music_play">
+        <MSBuild Projects="..\examples\music_play.dproj"/>
     </Target>
-    <Target Name="BasicTiledTexture:Clean">
-        <MSBuild Projects="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj" Targets="Clean"/>
+    <Target Name="music_play:Clean">
+        <MSBuild Projects="..\examples\music_play.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BasicTiledTexture:Make">
-        <MSBuild Projects="..\examples\1.basic\tiledtexture\BasicTiledTexture.dproj" Targets="Make"/>
+    <Target Name="music_play:Make">
+        <MSBuild Projects="..\examples\music_play.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BasicVideo">
-        <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj"/>
+    <Target Name="speech_play">
+        <MSBuild Projects="..\examples\speech_play.dproj"/>
     </Target>
-    <Target Name="BasicVideo:Clean">
-        <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj" Targets="Clean"/>
+    <Target Name="speech_play:Clean">
+        <MSBuild Projects="..\examples\speech_play.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BasicVideo:Make">
-        <MSBuild Projects="..\examples\1.basic\video\BasicVideo.dproj" Targets="Make"/>
+    <Target Name="speech_play:Make">
+        <MSBuild Projects="..\examples\speech_play.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BasicStarfield">
-        <MSBuild Projects="..\examples\1.basic\Starfield\BasicStarfield.dproj"/>
+    <Target Name="starfield_render">
+        <MSBuild Projects="..\examples\starfield_render.dproj"/>
     </Target>
-    <Target Name="BasicStarfield:Clean">
-        <MSBuild Projects="..\examples\1.basic\Starfield\BasicStarfield.dproj" Targets="Clean"/>
+    <Target Name="starfield_render:Clean">
+        <MSBuild Projects="..\examples\starfield_render.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BasicStarfield:Make">
-        <MSBuild Projects="..\examples\1.basic\Starfield\BasicStarfield.dproj" Targets="Make"/>
+    <Target Name="starfield_render:Make">
+        <MSBuild Projects="..\examples\starfield_render.dproj" Targets="Make"/>
     </Target>
-    <Target Name="InterEntityCollision">
-        <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj"/>
+    <Target Name="texture_render">
+        <MSBuild Projects="..\examples\texture_render.dproj"/>
     </Target>
-    <Target Name="InterEntityCollision:Clean">
-        <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj" Targets="Clean"/>
+    <Target Name="texture_render:Clean">
+        <MSBuild Projects="..\examples\texture_render.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="InterEntityCollision:Make">
-        <MSBuild Projects="..\examples\2.intermediate\EntityCollision\InterEntityCollision.dproj" Targets="Make"/>
+    <Target Name="texture_render:Make">
+        <MSBuild Projects="..\examples\texture_render.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="texture_tiled">
+        <MSBuild Projects="..\examples\texture_tiled.dproj"/>
+    </Target>
+    <Target Name="texture_tiled:Clean">
+        <MSBuild Projects="..\examples\texture_tiled.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="texture_tiled:Make">
+        <MSBuild Projects="..\examples\texture_tiled.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="video_chained_play">
+        <MSBuild Projects="..\examples\video_chained_play.dproj"/>
+    </Target>
+    <Target Name="video_chained_play:Clean">
+        <MSBuild Projects="..\examples\video_chained_play.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="video_chained_play:Make">
+        <MSBuild Projects="..\examples\video_chained_play.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="video_play">
+        <MSBuild Projects="..\examples\video_play.dproj"/>
+    </Target>
+    <Target Name="video_play:Clean">
+        <MSBuild Projects="..\examples\video_play.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="video_play:Make">
+        <MSBuild Projects="..\examples\video_play.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="LuArc;BasicMusic;BasicSpeech;BasicTexture;BasicTiledTexture;BasicVideo;BasicStarfield;InterEntityCollision"/>
+        <CallTarget Targets="LuArc;elastic_demo;entity_collision;font_unicode;music_play;speech_play;starfield_render;texture_render;texture_tiled;video_chained_play;video_play"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="LuArc:Clean;BasicMusic:Clean;BasicSpeech:Clean;BasicTexture:Clean;BasicTiledTexture:Clean;BasicVideo:Clean;BasicStarfield:Clean;InterEntityCollision:Clean"/>
+        <CallTarget Targets="LuArc:Clean;elastic_demo:Clean;entity_collision:Clean;font_unicode:Clean;music_play:Clean;speech_play:Clean;starfield_render:Clean;texture_render:Clean;texture_tiled:Clean;video_chained_play:Clean;video_play:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="LuArc:Make;BasicMusic:Make;BasicSpeech:Make;BasicTexture:Make;BasicTiledTexture:Make;BasicVideo:Make;BasicStarfield:Make;InterEntityCollision:Make"/>
+        <CallTarget Targets="LuArc:Make;elastic_demo:Make;entity_collision:Make;font_unicode:Make;music_play:Make;speech_play:Make;starfield_render:Make;texture_render:Make;texture_tiled:Make;video_chained_play:Make;video_play:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -78,7 +78,6 @@ type
   { TLuArc }
   TLuArc = class(TLuGame)
   public
-    procedure OnSetSettings; override;
     procedure OnRun; override;
   end;
 
@@ -88,39 +87,29 @@ uses
   System.IOUtils;
 
 { TLuArc }
-procedure TLuArc.OnSetSettings;
-begin
-  inherited;
-
-  // Gameloop
-  Settings.StartGameLoop := False;
-
-  // Logger
-  Settings.LogToConsole := False;
-end;
-
 procedure TLuArc.OnRun;
 var
   LPassword: string;
   LArchiveFilename: string;
   LDirectoryName: string;
+  LArchive: TLuArchive;
 
   procedure Header;
   begin
-    PrintLn('', []);
-    PrintLn('LuArc™ v%s', [GetVersion]);
-    PrintLn('Luna Game Toolkit™ Archive Utility', []);
-    PrintLn('Copyright © 2022 tinyBigGAMES™ LLC', []);
-    PrintLn('All Rights Reserved.', []);
+    Console.PrintLn('', []);
+    Console.PrintLn('LuArc™ v%s', [GetVersion]);
+    Console.PrintLn('Luna Game Toolkit™ Archive Utility', []);
+    Console.PrintLn('Copyright © 2022 tinyBigGAMES™ LLC', []);
+    Console.PrintLn('All Rights Reserved.', []);
   end;
 
   procedure Usage;
   begin
-    PrintLn('', []);
-    PrintLn('Usage: LuArc [password] archivename[.arc] directoryname', []);
-    PrintLn('  password      - make archive password protected', []);
-    PrintLn('  archivename   - zip archive name', []);
-    PrintLn('  directoryname - directory to archive', []);
+    Console.PrintLn('', []);
+    Console.PrintLn('Usage: LuArc [password] archivename[.arc] directoryname', []);
+    Console.PrintLn('  password      - make archive password protected', []);
+    Console.PrintLn('  archivename   - zip archive name', []);
+    Console.PrintLn('  directoryname - directory to archive', []);
   end;
 
 begin
@@ -154,7 +143,7 @@ begin
     begin
       // show usage
       Usage;
-      Pause;
+      Console.Pause;
       Exit;
     end;
 
@@ -165,28 +154,33 @@ begin
   // check if directory exist
   if not TDirectory.Exists(LDirectoryName) then
     begin
-      PrintLn;
-      PrintLn('Directory was not found: ', [LDirectoryName]);
+      Console.PrintLn;
+      Console.PrintLn('Directory was not found: ', [LDirectoryName]);
       Usage;
-      Pause;
+      Console.Pause;
       Exit;
     end;
 
   // display params
-  PrintLn;
+  Console.PrintLn;
   if LPassword = '' then
-    PrintLn('Password : NONE')
+    Console.PrintLn('Password : NONE')
   else
-    PrintLn('Password : %s', [LPassword]);
-  PrintLn('Archive  : %s', [LArchiveFilename]);
-  PrintLn('Directory: %s', [LDirectoryName]);
+    Console.PrintLn('Password : %s', [LPassword]);
+  Console.PrintLn('Archive  : %s', [LArchiveFilename]);
+  Console.PrintLn('Directory: %s', [LDirectoryName]);
 
   // try to build archive
-  if BuildArchive(LPassword, LArchiveFilename, LDirectoryName) then
-    PrintLn(cLuLF+'Success!')
-  else
-    PrintLn(cLuLF+'Failed!');
-  Pause;
+  LArchive := TLuArchive.Create;
+  try
+    if LArchive.Build(LPassword, LArchiveFilename, LDirectoryName) then
+      Console.PrintLn(cLuLF+'Success!')
+    else
+      Console.PrintLn(cLuLF+'Failed!');
+    Console.Pause;
+  finally
+    FreeNilObject(LArchive);
+  end;
 end;
 
 end.

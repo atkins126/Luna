@@ -21,8 +21,6 @@ if you wish to learn more about the Delphi language visit <a href="https://learn
 - **Free** and open-source. See <a href="https://github.com/tinyBigGAMES/Luna/blob/main/LICENSE" target="_blank">License agreement</a>.
 - Written in **Object Pascal**
 - Support Windows 64 bit platform
-- Powered by SDL (https://github.com/libsdl-org/SDL)
-- Everything will be linked into your executable, ready for use with no DLLs to maintain. 
 - Hardware accelerated with **Direct3D**
 - You interact with Luna via your derived `TLuGame` class and the various classes and routines in the `Luna` unit.
 - **Archive** (zip archive format, password protection)
@@ -43,9 +41,21 @@ if you wish to learn more about the Delphi language visit <a href="https://learn
 - And more. See `Luna.pas` in `installdir\sources` and the docs in `installdir\docs` for more information about features.
 
 ## Minimum System Requirements
-- <a href="https://www.embarcadero.com/products/delphi/starter" target="_blank">Delphi Community Edition</a>, win64 platform
+- <a href="https://www.embarcadero.com/products/delphi/starter" target="_blank">Delphi Community Edition</a>, Win64 platform
 - Microsoft Windows 10, 64 bits
 - DirectX 9
+
+## External Dependencies
+Luna Game Toolkit make use of the the following libraries:
+- SDL (https://github.com/libsdl-org/SDL)
+- SDL_image (https://github.com/libsdl-org/SDL_image)
+- SDL_mixer (https://github.com/libsdl-org/SDL_mixer)
+- SDL_ttf (https://github.com/libsdl-org/SDL_ttf)
+- pl_mpeg (https://github.com/phoboslab/pl_mpeg)
+- Nuklear (https://github.com/Immediate-Mode-UI/Nuklear)
+- Delphi_MemoryModule (https://github.com/Fr0sT-Brutal/Delphi_MemoryModule)
+
+All external dependencies are compiled directly into your executable with an ~1.7MB overhead and no DLLs to maintain.
 
 ## Sponsor Benefits 
 - You will have priority support with access to our private Luna development forum and discord channel.
@@ -179,5 +189,5 @@ Our development motto:
 
 <p align="center">
  <a href="https://www.embarcadero.com/products/delphi" target="_blank"><img src="media/delphi.png"></a><br/>
- ♥ <b>Made for Delphi</b>
+ Made with ♥ for <b>Delphi</b>
 </p>
